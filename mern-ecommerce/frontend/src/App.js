@@ -19,8 +19,8 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
          
  </Routes>
-        </Router>
-  ,const [message, setMessage] = useState("");
+        </Router>;
+const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("https://YOUR_BACKEND_URL.com")
