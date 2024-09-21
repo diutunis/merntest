@@ -19,7 +19,7 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
          
  </Routes>
-        </Router>;
+        </Router>,
 const [message, setMessage] = useState("");
 
   useEffect(() => {
