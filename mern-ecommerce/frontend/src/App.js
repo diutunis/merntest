@@ -20,7 +20,7 @@ function App() {
          
  </Routes>
         </Router>
-  const [message, setMessage] = useState("");
+  ,const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("https://YOUR_BACKEND_URL.com")
