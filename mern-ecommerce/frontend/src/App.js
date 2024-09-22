@@ -6,7 +6,7 @@ import './Styles.css'; // Make sure to import your styles
 import BlogPage from './pages/BlogPage';
 import ShopPage from './pages/ShopPage';
 import ContactPage from './pages/ContactPage';
-import BottomNav from './components/BottomNav'; // Import the BottomNav component
+import BottomNav from './pages/BottomNav'; // Import the BottomNav component
 
 
 
