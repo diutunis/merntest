@@ -12,7 +12,7 @@ const ProductGrid = () => {
         // Fetch products from backend
         const fetchProducts = async () => {
             try {
-                const { data } = await axios.get('https://merntest-1.onrender.com/'); // API call to get products
+                const { data } = await axios.get('https://merntest-1.onrender.com/api/products'); // API call to get products
                 setProducts(data);
                 setLoading(false);
             } catch (err) {
