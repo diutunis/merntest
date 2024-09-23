@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const productRoutes = require('./routes/productRoutes');
+const bodyParser = require('body-parser');
+const Drawing = require('./models/Drawing'); // Mongoose model for drawings
 
 // Load environment variables
 dotenv.config();
@@ -13,6 +15,7 @@ const app = express();
 // Use middleware
 app.use(cors());
 app.use(express.json());
+app.use(bodyParser.json({ limit: '10mb' })); // Set higher limit for large base64 strings
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -20,6 +23,29 @@ mongoose.connect(process.env.MONGO_URI, {
     useUnifiedTopology: true,
 }).then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
+
+// GET route to fetch all drawings
+app.get('/api/drawings', async (req, res) => {
+    try {
+        const drawings = await Drawing.find({});
+        res.json(drawings);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch drawings' });
+    }
+});
+
+// POST route to save a new drawing
+app.post('/api/drawings', async (req, res) => {
+    const { drawing } = req.body;
+    try {
+        const newDrawing = new Drawing({ drawing });
+        await newDrawing.save();
+        res.status(201).json(newDrawing);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to save drawing' });
+    }
+});
+
 
 // Sample route
 app.get('/', (req, res) => {

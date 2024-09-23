@@ -1,10 +1,20 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
+
+    useEffect(() => {
+        // Fetch existing drawings from the backend when the component loads
+        const fetchDrawings = async () => {
+            const response = await fetch('/api/drawings');
+            const data = await response.json();
+            setDrawings(data);
+        };
+        fetchDrawings();
+    }, []);
 
     const startDrawing = ({ nativeEvent }) => {
         const { offsetX, offsetY } = nativeEvent;
@@ -33,9 +43,20 @@ const HomePage = () => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     };
 
-    const saveDrawing = () => {
+    const saveDrawing = async () => {
         const drawing = canvasRef.current.toDataURL('image/png');
-        setDrawings([...drawings, drawing]);
+        
+        // Send the drawing to the backend
+        const response = await fetch('/api/drawings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ drawing }),
+        });
+        
+        const savedDrawing = await response.json();
+        setDrawings([...drawings, savedDrawing]);
         clearCanvas();
     };
 
@@ -57,7 +78,7 @@ const HomePage = () => {
             <div className="posted-drawings">
                 {drawings.map((drawing, index) => (
                     <div key={index} className="drawing-item">
-                        <img src={drawing} alt={`User drawing ${index + 1}`} />
+                        <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                     </div>
                 ))}
             </div>
