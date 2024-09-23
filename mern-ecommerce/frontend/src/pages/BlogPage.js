@@ -1,16 +1,13 @@
 import React from 'react';
-import './BlogPage.css'; // Optional for custom styles
+import './BlogPage.css';
 
 const BlogPage = () => {
     return (
         <div className="pdf-container">
-            <iframe
+            <embed
                 src="./pdf-file.pdf"
-                title="Blog PDF"
-                width="100%"
-                height="1000px"
-                frameBorder="0"
-                allowFullScreen
+                type="application/pdf"
+                className="responsive-embed"
             />
         </div>
     );
