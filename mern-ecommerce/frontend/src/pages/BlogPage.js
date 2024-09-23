@@ -4,10 +4,12 @@ import './BlogPage.css';
 const BlogPage = () => {
     return (
         <div className="pdf-container">
-            <embed
+            <iframe
                 src="./pdf-file.pdf"
-                type="application/pdf"
-                className="responsive-embed"
+                title="Blog PDF"
+                className="responsive-iframe"
+                frameBorder="0"
+                allowFullScreen
             />
         </div>
     );

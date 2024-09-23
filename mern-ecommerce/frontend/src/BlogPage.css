@@ -8,7 +8,7 @@
     padding: 10px;
 }
 
-.responsive-embed {
+.responsive-iframe {
     width: 100%;
     height: 100%;
     max-width: 100%;
@@ -22,15 +22,14 @@
         height: 100%;
     }
 
-    .responsive-embed {
-        height: 85vh;
+    .responsive-iframe {
+        height: 85vh; /* Ensure it's scrollable and doesn't overflow */
     }
 }
 
 @media (max-width: 480px) {
-    .responsive-embed {
+    .responsive-iframe {
         height: 75vh;
     }
 }
-
 
