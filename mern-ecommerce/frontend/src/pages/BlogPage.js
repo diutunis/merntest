@@ -1,27 +1,20 @@
-import React, { useState } from 'react';
-import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
-
-
-
-import './BlogPage.css'; // Add some styles for the PDF container
+import React from 'react';
+import './BlogPage.css'; // Optional for custom styles
 
 const BlogPage = () => {
-    const [numPages, setNumPages] = useState(null);
-
-    const onDocumentLoadSuccess = ({ numPages }) => {
-        setNumPages(numPages);
-    };
-
     return (
         <div className="pdf-container">
-            <Document
-                file="\public\pdf-file.pdf"  // Replace this with the actual path to your PDF
-                onLoadSuccess={onDocumentLoadSuccess}
+            <object
+                data="\public\pdf-file.pdf"
+                type="application/pdf"
+                width="100%"
+                height="1000px"
             >
-                {Array.from(new Array(numPages), (el, index) => (
-                    <Page key={`page_${index + 1}`} pageNumber={index + 1} />
-                ))}
-            </Document>
+                <p>
+                    It appears your browser doesn't support embedding PDFs. You can{' '}
+                    <a href="/path-to-your-pdf-file.pdf">download the PDF</a> instead.
+                </p>
+            </object>
         </div>
     );
 };
