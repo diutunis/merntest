@@ -2,7 +2,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ReactDOM from 'react-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { fa-solid fa-pen-nib, fa-regular fa-file-lines, faShoppingCart, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 
 
 import './BottomNav.css'; // CSS for styling the navigation bar
