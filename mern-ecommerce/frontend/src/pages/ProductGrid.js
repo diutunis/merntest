@@ -12,7 +12,7 @@ const ProductGrid = () => {
         // Fetch products from backend
         const fetchProducts = async () => {
             try {
-                const { data } = await axios.get('https://merntest-1.onrender.com/api/products'); // API call to get products
+                const { data } = await axios.get('https://merntest-1.onrender.com/api/drawings'); // API call to get products
                 setProducts(data);
                 setLoading(false);
             } catch (err) {
@@ -45,11 +45,11 @@ const ProductGrid = () => {
             <div className="product-grid">
                 {products.map((product) => (
                     <div
-                        key={product._id} // Use _id as a key from MongoDB
+                        key={Product._id} // Use _id as a key from MongoDB
                         className="product-card"
                         onClick={() => handleProductClick(product)}
                     >
-                        <img src={product.image} alt={product.name} />
+                        <img src={product.drawing} alt={product.createdAt} />
                         <h3>{product.name}</h3>
                     </div>
                 ))}
