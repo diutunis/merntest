@@ -8,7 +8,7 @@ import './BlogPage.css'; // Optional for custom styles
 
 const BlogPage = () => {
     return (
-       
+ <>      
  <div class="container" id="container"></div>
  <section class="container" id="about">
             <h1 >Something I may consume, the dark.</h1>
@@ -312,6 +312,7 @@ good is he who gives and recieves naught.
                 allowFullScreen
             />
         </div>
+</>
     );
 };
 
