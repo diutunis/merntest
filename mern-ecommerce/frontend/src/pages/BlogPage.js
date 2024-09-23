@@ -6,7 +6,7 @@ import './BlogPage.css'; // Custom styles
 
 
 const BlogPage = () => {
-    
+        const bubbleRefs = useRef([]);
  useEffect(() => {
         const bubbles = bubbleRefs.current;
         const screenWidth = window.innerWidth;
