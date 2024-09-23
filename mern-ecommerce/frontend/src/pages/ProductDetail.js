@@ -55,7 +55,7 @@ const ProductDetail = ({ product, onClose }) => {
                 <textarea
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Enter your address or special requests"
+                    placeholder="Enter your address send $2 and i will mail you aprint of your drawing"
                     rows="4"
                     cols="50"
                     disabled={isSubmitting}
