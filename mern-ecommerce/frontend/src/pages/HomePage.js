@@ -9,7 +9,7 @@ const HomePage = () => {
     useEffect(() => {
         // Fetch existing drawings from the backend when the component loads
         const fetchDrawings = async () => {
-            const response = await fetch('/api/drawings');
+            const response = await fetch('https://merntest-1.onrender.com/api/drawings');
             const data = await response.json();
             setDrawings(data);
         };
@@ -47,7 +47,7 @@ const HomePage = () => {
         const drawing = canvasRef.current.toDataURL('image/png');
         
         // Send the drawing to the backend
-        const response = await fetch('/api/drawings', {
+        const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
