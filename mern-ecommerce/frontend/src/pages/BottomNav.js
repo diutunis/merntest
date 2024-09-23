@@ -9,16 +9,16 @@ const BottomNav = () => {
     return (
         <div className="bottom-nav">
             <Link to="/" className="nav-item">
-                <FontAwesomeIcon icon={faHome} />
-                <span>Home</span>
+                <FontAwesomeIcon icon="fa-solid fa-pen-nib" />
+                <span></span>
             </Link>
             <Link to="/blog" className="nav-item">
-                <FontAwesomeIcon icon={faBlog} />
-                <span>Blog</span>
+             <FontAwesomeIcon icon="fa-regular fa-file-lines" />
+                <span></span>
             </Link>
             <Link to="/shop" className="nav-item">
                 <FontAwesomeIcon icon={faShoppingCart} />
-                <span>Shop</span>
+                <span></span>
             </Link>
             <Link to="/contact" className="nav-item">
                 <FontAwesomeIcon icon={faEnvelope} />

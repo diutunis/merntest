@@ -1,6 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 
+<div>
+<h3>give me an idea</h3>
+</div>
+
 const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
