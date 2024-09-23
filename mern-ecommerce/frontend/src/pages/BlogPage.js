@@ -1,5 +1,5 @@
 import React from 'react';
-import './BlogPage.css';
+import './BlogPage.css'; // Optional for custom styles
 
 const BlogPage = () => {
     return (
@@ -7,7 +7,8 @@ const BlogPage = () => {
             <iframe
                 src="./pdf-file.pdf"
                 title="Blog PDF"
-                className="responsive-iframe"
+                width="100%"
+                height="1000px"
                 frameBorder="0"
                 allowFullScreen
             />
@@ -16,4 +17,3 @@ const BlogPage = () => {
 };
 
 export default BlogPage;
-
