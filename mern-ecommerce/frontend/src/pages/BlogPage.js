@@ -8,6 +8,7 @@ import './BlogPage.css'; // Optional for custom styles
 
 const BlogPage = () => {
     return (
+       
  <div class="container" id="container"></div>
  <section class="container" id="about">
             <h1 >Something I may consume, the dark.</h1>
@@ -300,7 +301,8 @@ good is he who gives and recieves naught.
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/KTusHC6oJaen7L_o" frameborder="0" allowfullscreen></iframe>
 
-        <div className="pdf-container">
+
+ <div className="pdf-container">
             <iframe
                 src="./pdf-file.pdf"
                 title="Blog PDF"
