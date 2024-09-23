@@ -1,0 +1,11 @@
+.pdf-container {
+    height: 100vh; /* Full viewport height */
+    overflow-y: scroll; /* Vertical scrolling */
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.pdf-container canvas {
+    display: block;
+    margin: 0 auto 20px;
+}
