@@ -1,10 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 
-<div>
-<h3>give me an idea</h3>
-</div>
-
 const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
@@ -20,23 +16,34 @@ const HomePage = () => {
         fetchDrawings();
     }, []);
 
-    const startDrawing = ({ nativeEvent }) => {
-        const { offsetX, offsetY } = nativeEvent;
+    // Function to get touch or mouse position relative to canvas
+    const getPosition = (nativeEvent) => {
+        const rect = canvasRef.current.getBoundingClientRect();
+        if (nativeEvent.touches) {
+            const touch = nativeEvent.touches[0];
+            return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+        }
+        return { x: nativeEvent.offsetX, y: nativeEvent.offsetY };
+    };
+
+    const startDrawing = (nativeEvent) => {
+        const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.beginPath();
-        context.moveTo(offsetX, offsetY);
+        context.moveTo(x, y);
         setIsDrawing(true);
     };
 
-    const draw = ({ nativeEvent }) => {
+    const draw = (nativeEvent) => {
         if (!isDrawing) return;
-        const { offsetX, offsetY } = nativeEvent;
+        const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
-        context.lineTo(offsetX, offsetY);
+        context.lineTo(x, y);
         context.stroke();
     };
 
     const stopDrawing = () => {
+        if (!isDrawing) return;
         const context = canvasRef.current.getContext('2d');
         context.closePath();
         setIsDrawing(false);
@@ -72,9 +79,12 @@ const HomePage = () => {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
                 className="drawing-canvas"
-                width="500"
-                height="500"
+                width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
+                height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
             />
             <button onClick={saveDrawing}>Post Drawing</button>
             <button onClick={clearCanvas}>Clear Drawing</button>
@@ -91,4 +101,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
