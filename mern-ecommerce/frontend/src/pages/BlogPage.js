@@ -5,7 +5,7 @@ const BlogPage = () => {
     return (
         <div className="pdf-container">
             <object
-                data="\public\pdf-file.pdf"
+                data=".\public\pdf-file.pdf"
                 type="application/pdf"
                 width="100%"
                 height="1000px"
