@@ -9,6 +9,10 @@ const DrawingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+ address: {
+        type: String, // Base64 encoded string
+        required: false,
+    }
 });
 
 module.exports = mongoose.model('Drawing', DrawingSchema);
