@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Document, Page } from 'react-pdf';
+import { Document, Page } from '@react-pdf-viewer/core';
+
 
 import './BlogPage.css'; // Add some styles for the PDF container
 
