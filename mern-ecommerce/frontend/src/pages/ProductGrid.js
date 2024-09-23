@@ -45,7 +45,7 @@ const ProductGrid = () => {
             <div className="product-grid">
                 {products.map((product) => (
                     <div
-                        key={Product._id} // Use _id as a key from MongoDB
+                        key={product._id} // Use _id as a key from MongoDB
                         className="product-card"
                         onClick={() => handleProductClick(product)}
                     >
