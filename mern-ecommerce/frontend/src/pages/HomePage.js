@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 
 const HomePage = () => {
-          <h1>give me an idea</h1>
+          <div><h1>give me an idea</h1></div>
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
