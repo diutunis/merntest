@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import ReactDOM from 'react-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { byPrefixAndName } from '@awesome.me/kit-KIT_CODE/icons'
+
 
 import './BottomNav.css'; // CSS for styling the navigation bar
 
