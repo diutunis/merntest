@@ -78,7 +78,7 @@ const HomePage = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ drawing, likes: 0 }),  // Initially set likes to 0
+            body: JSON.stringify({ drawing }),  // Remove likes from here; the backend should set it to 0
         });
         
         const savedDrawing = await response.json();
@@ -122,7 +122,7 @@ const HomePage = () => {
 
             <div className="posted-drawings">
                 {drawings.map((drawing, index) => (
-                    <div key={index} className="drawing-item">
+                    <div key={drawing._id} className="drawing-item"> {/* Use drawing._id as key */}
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
                             <button onClick={() => handleLike(drawing._id)}>👍 Like</button>
@@ -136,6 +136,7 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 
 
 
