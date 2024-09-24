@@ -9,13 +9,9 @@ const DrawingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    address: {
-        type: String, // Base64 encoded string
-        required: false,
-    },
     likes: {
-        type: Number, // Number of likes for the drawing
-        default: 0,   // Default is 0 likes when a drawing is created
+        type: Number,
+        default: 0,  // Initialize likes to 0
     },
 });
 

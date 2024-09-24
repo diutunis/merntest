@@ -1,28 +1,21 @@
-// Assuming you have Express set up
 const express = require('express');
+const Drawing = require('./models/Drawing'); // Adjust path as necessary
 const router = express.Router();
-const Drawing = require('../models/Drawing'); // Adjust the path based on your project structure
 
-// Route to increment the like count
-router.post('/:id/like', async (req, res) => {
+// Like a drawing
+router.post('/drawings/:id/like', async (req, res) => {
     try {
-        // Find the drawing by ID and increment the like count
-        const drawing = await Drawing.findByIdAndUpdate(
-            req.params.id,
-            { $inc: { likes: 1 } }, // $inc operator increments the likes field by 1
-            { new: true } // Return the updated document
-        );
-
+        const drawing = await Drawing.findById(req.params.id);
         if (!drawing) {
             return res.status(404).json({ message: 'Drawing not found' });
         }
-
-        res.json(drawing);
+        drawing.likes += 1; // Increment likes
+        await drawing.save(); // Save the updated drawing
+        return res.json({ likes: drawing.likes });
     } catch (error) {
-        console.error('Error updating likes:', error);
-        res.status(500).json({ message: 'Error updating likes' });
+        console.error(error);
+        return res.status(500).json({ message: 'Server error' });
     }
 });
 
 module.exports = router;
-
