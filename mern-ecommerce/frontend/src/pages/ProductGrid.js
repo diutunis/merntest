@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import ProductDetail from './ProductDetail';
 import axios from 'axios';  // Axios will help with fetching data
+import './ProductGrid.css';
+
 
 const ProductGrid = () => {
     const [products, setProducts] = useState([]);
