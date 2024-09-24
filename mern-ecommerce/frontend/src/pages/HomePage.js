@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles} from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
