@@ -4,7 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
-const Drawing = require('./models/Drawing'); // Mongoose model for drawings
+const Drawing = require('../backend/models/Drawing'); // Mongoose model for drawings
 const drawingsRouter = require('./routes/drawingRoutes');
 
 
