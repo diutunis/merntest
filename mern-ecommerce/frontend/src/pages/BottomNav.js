@@ -20,11 +20,11 @@ const BottomNav = () => {
                 <span></span>
             </Link>
             <Link to="/shop" className="nav-item">
-                <FontAwesomeIcon icon={faShoppingCart} />
+                <FontAwesomeIcon icon={faBoxOpen} /> 
                 <span></span>
             </Link>
             <Link to="/contact" className="nav-item">
-                <FontAwesomeIcon icon={faEnvelope} />
+               <FontAwesomeIcon icon={faPersonBurst} />
                 <span>Contact</span>
             </Link>
         </div>
