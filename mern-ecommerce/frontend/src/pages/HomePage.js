@@ -14,6 +14,18 @@ const HomePage = () => {
             setDrawings(data);
         };
         fetchDrawings();
+
+        // Disable scroll on the entire body when touch events are happening on the canvas
+        const disableScroll = (e) => {
+            if (e.target === canvasRef.current) {
+                e.preventDefault();
+            }
+        };
+
+        document.body.addEventListener('touchmove', disableScroll, { passive: false });
+        return () => {
+            document.body.removeEventListener('touchmove', disableScroll);
+        };
     }, []);
 
     // Function to get touch or mouse position relative to canvas
@@ -104,4 +116,5 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 
