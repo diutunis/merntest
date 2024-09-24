@@ -10,8 +10,8 @@
 
 /* Style for each product card */
 .product-card {
-    background-color: #f5f5f5;
-    border-radius: 10px;
+    background-color: #00000;
+    border-radius: 0px;
     overflow: hidden;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     cursor: pointer;
@@ -27,7 +27,7 @@
     width: 100%;
     height: auto;
     object-fit: cover;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 0px solid #ddd;
 }
 
 /* Text styling for product names */
