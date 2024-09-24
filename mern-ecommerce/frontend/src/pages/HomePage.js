@@ -125,8 +125,8 @@ const HomePage = () => {
                     <div key={drawing._id} className="drawing-item"> {/* Use drawing._id as key */}
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
-                            <button onClick={() => handleLike(drawing._id)}>👍 Like</button>
-                            <span>{drawing.likes || 0} Likes</span>
+                            <button onClick={() => handleLike(drawing._id)}>witness</button>
+                            <span>{drawing.likes || 0} </span>
                         </div>
                     </div>
                 ))}
