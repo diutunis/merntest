@@ -5,6 +5,10 @@ const dotenv = require('dotenv');
 const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
 const Drawing = require('./models/Drawing'); // Mongoose model for drawings
+const drawingsRouter = require('./routes/drawings');
+app.use('/api/drawings', drawingsRouter);
+
+
 
 // Load environment variables
 dotenv.config();
