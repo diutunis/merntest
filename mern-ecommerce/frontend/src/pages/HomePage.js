@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 
 const HomePage = () => {
-          <div><h1>give me an idea</h1></div>
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
@@ -28,6 +27,7 @@ const HomePage = () => {
     };
 
     const startDrawing = (nativeEvent) => {
+        nativeEvent.preventDefault();  // Prevent scrolling
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.beginPath();
@@ -36,6 +36,7 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
+        nativeEvent.preventDefault();  // Prevent scrolling
         if (!isDrawing) return;
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -43,7 +44,8 @@ const HomePage = () => {
         context.stroke();
     };
 
-    const stopDrawing = () => {
+    const stopDrawing = (nativeEvent) => {
+        nativeEvent.preventDefault();  // Prevent scrolling
         if (!isDrawing) return;
         const context = canvasRef.current.getContext('2d');
         context.closePath();
@@ -98,6 +100,11 @@ const HomePage = () => {
                 ))}
             </div>
         </div>
+    );
+};
+
+export default HomePage;
+
     );
 };
 
