@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
+import { faHandSparkles} from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
@@ -125,7 +126,7 @@ const HomePage = () => {
                     <div key={drawing._id} className="drawing-item"> {/* Use drawing._id as key */}
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
-                            <button onClick={() => handleLike(drawing._id)}>witness</button>
+                            <button onClick={() => handleLike(drawing._id)}><FontAwesomeIcon icon={faHandSparkles} /></button>
                             <span>{drawing.likes || 0} </span>
                         </div>
                     </div>
