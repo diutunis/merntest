@@ -22,8 +22,8 @@
 }
 
 .product-grid-item {
-    border: 1px solid #eaeaea;
-    padding: 15px;
+    border: 0px solid #eaeaea;
+    padding: 10px;
     background-color: #fff;
     transition: transform 0.3s ease;
     display: flex;
