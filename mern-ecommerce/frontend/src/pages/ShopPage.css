@@ -1,6 +1,6 @@
 /* Base styles for ShopPage */
 .shop-page-container {
-    padding: 20px;
+    padding: 0px;
     max-width: 100%; /* Use full width for mobile screens */
     margin: 0 auto; /* Center the container */
     box-sizing: border-box;
@@ -55,7 +55,7 @@
     }
 
     .product-grid-item {
-        padding: 12px;
+        padding: 0px;
     }
 
     .product-grid-item img {
@@ -74,7 +74,7 @@
     }
 
     .product-grid-item {
-        padding: 10px;
+        padding: 0px;
     }
 
     .product-grid-item img {
