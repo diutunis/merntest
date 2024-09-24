@@ -9,10 +9,14 @@ const DrawingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
- address: {
+    address: {
         type: String, // Base64 encoded string
         required: false,
-    }
+    },
+    likes: {
+        type: Number, // Number of likes for the drawing
+        default: 0,   // Default is 0 likes when a drawing is created
+    },
 });
 
 module.exports = mongoose.model('Drawing', DrawingSchema);

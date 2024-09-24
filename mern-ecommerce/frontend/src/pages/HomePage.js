@@ -78,12 +78,28 @@ const HomePage = () => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ drawing }),
+            body: JSON.stringify({ drawing, likes: 0 }),  // Initially set likes to 0
         });
         
         const savedDrawing = await response.json();
         setDrawings([...drawings, savedDrawing]);
         clearCanvas();
+    };
+
+    // Function to handle "like" action
+    const handleLike = async (drawingId) => {
+        // Update the like count in the backend
+        const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/like`, {
+            method: 'POST',
+        });
+        const updatedDrawing = await response.json();
+
+        // Update the state with the new number of likes
+        setDrawings((prevDrawings) =>
+            prevDrawings.map((drawing) =>
+                drawing._id === drawingId ? { ...drawing, likes: updatedDrawing.likes } : drawing
+            )
+        );
     };
 
     return (
@@ -108,6 +124,10 @@ const HomePage = () => {
                 {drawings.map((drawing, index) => (
                     <div key={index} className="drawing-item">
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
+                        <div className="like-section">
+                            <button onClick={() => handleLike(drawing._id)}>👍 Like</button>
+                            <span>{drawing.likes || 0} Likes</span>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -116,5 +136,6 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
 
 
