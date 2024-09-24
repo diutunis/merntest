@@ -25,7 +25,7 @@ const BottomNav = () => {
             </Link>
             <Link to="/contact" className="nav-item">
                <FontAwesomeIcon icon={faPersonBurst} />
-                <span>Contact</span>
+                <span></span>
             </Link>
         </div>
     );
