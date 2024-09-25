@@ -11,22 +11,37 @@ const ProductGrid = () => {
     const [error, setError] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [sortOption, setSortOption] = useState('newest'); // Default sort option
+    const [page, setPage] = useState(1); // Track the current page for pagination
+    const [hasMore, setHasMore] = useState(true); // To check if there are more products to fetch
+
+    // Fetch products from backend with pagination
+    const fetchProducts = async (pageNumber = 1) => {
+        try {
+            const { data } = await axios.get(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=30`);
+            setProducts((prevProducts) => [...prevProducts, ...data.drawings]); // Append new products to existing ones
+            setHasMore(pageNumber < data.totalPages); // Set if there are more pages to load
+            setLoading(false);
+        } catch (err) {
+            setError('Failed to fetch products');
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // Fetch products from backend
-        const fetchProducts = async () => {
-            try {
-                const { data } = await axios.get('https://merntest-1.onrender.com/api/drawings'); // API call to get products
-                setProducts(data);
-                setLoading(false);
-            } catch (err) {
-                setError('Failed to fetch products');
-                setLoading(false);
+        fetchProducts(page);
+    }, [page]);
+
+    // Infinite scroll logic
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && hasMore) {
+                setPage((prevPage) => prevPage + 1);
             }
         };
 
-        fetchProducts();
-    }, []);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [hasMore]);
 
     const handleProductClick = (product) => {
         setSelectedProduct(product);
@@ -51,7 +66,7 @@ const ProductGrid = () => {
         return 0;
     });
 
-    if (loading) {
+    if (loading && page === 1) {
         return <h2>Loading products...</h2>;
     }
 
@@ -82,6 +97,8 @@ const ProductGrid = () => {
                     </div>
                 ))}
             </div>
+
+            {loading && page > 1 && <h2>Loading more products...</h2>}
 
             {selectedProduct && (
                 <ProductDetail product={selectedProduct} onClose={handleCloseDetail} />
