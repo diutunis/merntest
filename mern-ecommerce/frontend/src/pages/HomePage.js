@@ -121,8 +121,8 @@ const HomePage = () => {
                 width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
             />
-            <button onClick={saveDrawing}>|||<FontAwesomeIcon icon={faSprayCan}/>|||</button>
-            <button onClick={clearCanvas}>|||<FontAwesomeIcon icon={faTrashCan} />|||</button>
+            <button onClick={saveDrawing}>post</button>
+            <button onClick={clearCanvas}>clear</button>
 
             <div className="posted-drawings">
                 {drawings.map((drawing, index) => (
