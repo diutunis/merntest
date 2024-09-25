@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'; 
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHandSparkles, faSprayCan, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faHandSparkles, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
@@ -11,21 +11,20 @@ const HomePage = () => {
     const [totalPages, setTotalPages] = useState(1); // Track total pages
 
     useEffect(() => {
-        // Fetch initial drawings when the component loads
+        // Fetch drawings with pagination
         const fetchDrawings = async () => {
             const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${page}&limit=30`);
             const data = await response.json();
-            setDrawings(prev => [...prev, ...data.drawings.reverse()]); // Add to existing drawings
-            setTotalPages(data.totalPages); // Update total pages
+            setDrawings(prev => [...prev, ...data.drawings.reverse()]); // Add new drawings to the state
+            setTotalPages(data.totalPages);
         };
 
         fetchDrawings();
     }, [page]);
 
-    // Infinite scroll event
+    // Infinite scroll to load more drawings
     useEffect(() => {
         const handleScroll = () => {
-            // If scroll is near bottom, load more drawings
             if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 && page < totalPages) {
                 setPage(prevPage => prevPage + 1);
             }
@@ -78,6 +77,7 @@ const HomePage = () => {
     const saveDrawing = async () => {
         const drawing = canvasRef.current.toDataURL('image/png');
 
+        // Send drawing to the backend
         const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
             headers: {
