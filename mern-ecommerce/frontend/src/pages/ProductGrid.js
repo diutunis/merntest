@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ProductDetail from './ProductDetail';
 import axios from 'axios';  // Axios will help with fetching data
 import './ProductGrid.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const ProductGrid = () => {
