@@ -24,11 +24,24 @@ mongoose.connect(process.env.MONGO_URI, {
 }).then(() => console.log('MongoDB connected'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// GET route to fetch all drawings
+// GET route to fetch paginated drawings
 app.get('/api/drawings', async (req, res) => {
+    const { page = 1, limit = 30 } = req.query; // Default page is 1 and limit is 30
     try {
-        const drawings = await Drawing.find({});
-        res.json(drawings);
+        const drawings = await Drawing.find({})
+            .sort({ createdAt: -1 }) // Sort by creation date, newest first
+            .limit(parseInt(limit))   // Convert limit to number
+            .skip((page - 1) * limit); // Skip previous pages
+
+        const totalDrawings = await Drawing.countDocuments(); // Total number of drawings
+        const totalPages = Math.ceil(totalDrawings / limit);   // Total number of pages
+
+        res.json({
+            drawings,
+            currentPage: parseInt(page),
+            totalPages,
+            totalDrawings
+        });
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch drawings' });
     }
@@ -75,4 +88,3 @@ app.use('/api/products', productRoutes);
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
