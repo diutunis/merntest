@@ -13,7 +13,7 @@ const HomePage = () => {
         const fetchDrawings = async () => {
             const response = await fetch('https://merntest-1.onrender.com/api/drawings');
             const data = await response.json();
-            setDrawings(data);
+            setDrawings(data.reverse()); // Reverse the data so newest are at the top
         };
         fetchDrawings();
 
@@ -84,7 +84,7 @@ const HomePage = () => {
         });
         
         const savedDrawing = await response.json();
-        setDrawings([savedDrawing, ...drawings]);  // Add new drawing at the beginning
+        setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]);  // Add new drawing at the top
         clearCanvas();
     };
 
@@ -119,11 +119,11 @@ const HomePage = () => {
                 width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
             />
-            <button onClick={saveDrawing}>Post </button>
-            <button onClick={clearCanvas}>Clear </button>
+            <button onClick={saveDrawing}>Post Drawing</button>
+            <button onClick={clearCanvas}>Clear Drawing</button>
 
             <div className="posted-drawings">
-                {drawings.slice().reverse().map((drawing, index) => (  // Reverse the array before mapping
+                {drawings.map((drawing, index) => (
                     <div key={drawing._id} className="drawing-item"> {/* Use drawing._id as key */}
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
@@ -138,5 +138,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
