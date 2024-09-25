@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ProductDetail from './ProductDetail';
 import axios from 'axios';  // Axios will help with fetching data
 import './ProductGrid.css';
+import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const ProductGrid = () => {
     const [products, setProducts] = useState([]);
@@ -63,7 +64,7 @@ const ProductGrid = () => {
                 <label htmlFor="sort">Sort by:</label>
                 <select id="sort" value={sortOption} onChange={handleSortChange}>
                     <option value="newest">Newest</option>
-                    <option value="likes">Most Liked</option>
+                    <option value="likes">Uppest</option>
                 </select>
             </div>
 
@@ -76,7 +77,7 @@ const ProductGrid = () => {
                     >
                         <img src={product.drawing} alt={product.createdAt} />
                         <h3>{product.name}</h3>
-                        <p>{product.likes} Likes</p> {/* Display likes */}
+                        <p>{product.likes} <FontAwesomeIcon icon={faHandSparkles} /></p> {/* Display likes */}
                     </div>
                 ))}
             </div>
