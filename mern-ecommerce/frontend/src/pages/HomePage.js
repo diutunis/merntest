@@ -56,9 +56,9 @@ const HomePage = () => {
         setDrawings((prevDrawings) => [...prevDrawings, ...newDrawings.reverse()]);
 
         // If the number of new drawings is less than pageSize, assume no more drawings
-        if (newDrawings.length < pageSize) {
-            setHasMore(false);
-        }
+      //  if (newDrawings.length < pageSize) {
+         //   setHasMore(false);
+       // }
     } catch (error) {
         console.error('Error fetching drawings:', error);
     }
