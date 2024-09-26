@@ -63,7 +63,14 @@ const HomePage = () => {
     // Canvas drawing functionality
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
-        return { x: nativeEvent.clientX - rect.left, y: nativeEvent.clientY - rect.top };
+        if (nativeEvent.touches && nativeEvent.touches.length > 0) {
+            // Get touch position for touch input
+            const touch = nativeEvent.touches[0];
+            return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+        } else {
+            // Get mouse position for mouse input
+            return { x: nativeEvent.clientX - rect.left, y: nativeEvent.clientY - rect.top };
+        }
     };
 
     const startDrawing = (nativeEvent) => {
@@ -151,6 +158,9 @@ const HomePage = () => {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing} // Stop drawing if the mouse leaves the canvas
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
                 className="drawing-canvas"
                 width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
