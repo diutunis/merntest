@@ -3,24 +3,28 @@
     flex-direction: column;
     align-items: center;
     position: relative;
+    width: 100%; /* Full width for better responsiveness */
 }
 
 .drawing-canvas {
     border: 1px solid black;
-    margin-bottom: 20px; /* Adds space between the canvas and the buttons */
+    margin: 0 auto; /* Center the canvas */
+    display: block; /* Allow margins to work properly */
 }
 
 .control-buttons {
     display: flex;
+    justify-content: center; /* Center the buttons */
     gap: 10px; /* Space between buttons */
-    margin-bottom: 20px; /* Space below the buttons */
+    margin: 10px 0; /* Adjust margin for better spacing */
 }
 
 .posted-drawings {
     display: flex;
     flex-direction: column; /* Stack drawings vertically */
     align-items: center; /* Center drawings */
-    max-width: 500px; /* Max width for drawings */
+    width: 100%; /* Make drawings take full width */
+    max-width: 500px; /* Limit max width */
     overflow-y: auto; /* Allow scrolling if too many drawings */
     margin-top: 20px; /* Space above drawings */
 }
@@ -29,6 +33,7 @@
     margin-bottom: 10px; /* Space between drawings */
     width: 100%; /* Make each drawing fill the width */
 }
+
 
 
 .drawing-item img {

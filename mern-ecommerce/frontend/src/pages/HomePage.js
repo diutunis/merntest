@@ -7,17 +7,16 @@ const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
-    const [page, setPage] = useState(1); 
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const pageSize = 30; 
-    const [scale, setScale] = useState(1); 
-    const [lastTouchDistance, setLastTouchDistance] = useState(null); 
-    const [zoomMode, setZoomMode] = useState(false); 
+    const pageSize = 30;
+    const [scale, setScale] = useState(1);
+    const [lastTouchDistance, setLastTouchDistance] = useState(null);
+    const [zoomMode, setZoomMode] = useState(false);
     const [offsetX, setOffsetX] = useState(0);
     const [offsetY, setOffsetY] = useState(0);
 
-    // Function to fetch drawings with pagination
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
 
@@ -62,7 +61,6 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
-    // Canvas drawing functionality
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         if (nativeEvent.touches) {
@@ -134,7 +132,6 @@ const HomePage = () => {
         );
     };
 
-    // Pinch-to-zoom and wheel zoom functionality
     const handleTouchStart = (event) => {
         if (!zoomMode || event.touches.length !== 2) return;
         const distance = Math.hypot(
@@ -155,7 +152,7 @@ const HomePage = () => {
         setScale((prevScale) => Math.max(0.5, Math.min(prevScale * scaleFactor, 4)));
         setLastTouchDistance(distance);
 
-        event.preventDefault(); 
+        event.preventDefault();
     };
 
     const handleWheel = (event) => {
@@ -197,9 +194,12 @@ const HomePage = () => {
                 onTouchMoveCapture={handleTouchMove}
                 onWheel={handleWheel}
                 className="drawing-canvas"
-                width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
-                height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
-                style={{ transform: `scale(${scale}) translate(${offsetX}px, ${offsetY}px)` }}
+                width={500}
+                height={500}
+                style={{
+                    transform: `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`,
+                    transition: 'transform 0.1s',
+                }}
             />
             <div className="control-buttons">
                 <button onClick={saveDrawing}>Post</button>
