@@ -60,18 +60,14 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
-    // Canvas drawing functionality (same as before)
+    // Canvas drawing functionality
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
-        if (nativeEvent.touches) {
-            const touch = nativeEvent.touches[0];
-            return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-        }
-        return { x: nativeEvent.offsetX, y: nativeEvent.offsetY };
+        return { x: nativeEvent.clientX - rect.left, y: nativeEvent.clientY - rect.top };
     };
 
     const startDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault();
+        nativeEvent.preventDefault(); // Prevent any default actions
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -80,8 +76,8 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
-        nativeEvent.preventDefault();
         if (!isDrawing) return;
+        nativeEvent.preventDefault(); // Prevent scrolling and other default actions
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.lineTo(x, y);
@@ -89,8 +85,8 @@ const HomePage = () => {
     };
 
     const stopDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault();
         if (!isDrawing) return;
+        nativeEvent.preventDefault();
         setIsDrawing(false);
         const context = canvasRef.current.getContext('2d');
         context.closePath();
@@ -154,10 +150,7 @@ const HomePage = () => {
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
-                onTouchStart={startDrawing}
-                onTouchMove={draw}
-                onTouchEnd={stopDrawing}
+                onMouseLeave={stopDrawing} // Stop drawing if the mouse leaves the canvas
                 className="drawing-canvas"
                 width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
