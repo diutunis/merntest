@@ -169,10 +169,10 @@ const HomePage = () => {
             <div
                 className="canvas-wrapper"
                 style={{
-                    overflow: 'hidden', // Prevent overflow from zooming
-                    position: 'relative', // Relative positioning for child elements
-                    width: '500px', // Fixed width
-                    height: '500px', // Fixed height
+                    overflow: 'hidden',
+                    position: 'relative',
+                    width: '500px',
+                    height: '500px',
                 }}
             >
                 <canvas
@@ -181,6 +181,9 @@ const HomePage = () => {
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}
                     onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
                     className="drawing-canvas"
                     style={{
                         border: '1px solid black',
