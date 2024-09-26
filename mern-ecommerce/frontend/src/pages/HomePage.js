@@ -17,6 +17,7 @@ const HomePage = () => {
     const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
     const [zoomMode, setZoomMode] = useState(false);
 
+    // Fetch drawings with pagination
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
 
@@ -25,16 +26,7 @@ const HomePage = () => {
             const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize}`);
             const data = await response.json();
 
-            let newDrawings = [];
-            if (Array.isArray(data)) {
-                newDrawings = data;
-            } else if (typeof data === 'object' && data.drawings) {
-                newDrawings = data.drawings;
-            } else {
-                console.error("Unexpected data format:", data);
-                return;
-            }
-
+            let newDrawings = Array.isArray(data) ? data : data.drawings || [];
             setDrawings((prevDrawings) => [...prevDrawings, ...newDrawings]);
 
             if (newDrawings.length < pageSize) {
@@ -50,6 +42,7 @@ const HomePage = () => {
         fetchDrawings();
     }, [page]);
 
+    // Handle scroll to load more drawings
     const handleScroll = () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
             setPage((prevPage) => prevPage + 1);
@@ -61,14 +54,16 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
+    // Position calculations for drawing
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         return {
-            x: nativeEvent.clientX - rect.left - pan.x,
-            y: nativeEvent.clientY - rect.top - pan.y
+            x: (nativeEvent.clientX - rect.left - pan.x) / scale,
+            y: (nativeEvent.clientY - rect.top - pan.y) / scale
         };
     };
 
+    // Drawing functions
     const startDrawing = (nativeEvent) => {
         if (zoomMode) return;
         nativeEvent.preventDefault();
@@ -105,15 +100,11 @@ const HomePage = () => {
 
     const saveDrawing = async () => {
         const drawing = canvasRef.current.toDataURL('image/png');
-
         const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ drawing }),
         });
-
         const savedDrawing = await response.json();
         setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]);
         clearCanvas();
@@ -131,6 +122,7 @@ const HomePage = () => {
         );
     };
 
+    // Zoom functionality
     const handleWheel = (event) => {
         if (!zoomMode) return;
         event.preventDefault();
@@ -139,7 +131,11 @@ const HomePage = () => {
     };
 
     const toggleZoomMode = () => {
-        setZoomMode(!zoomMode);
+        setZoomMode((prev) => !prev);
+        if (zoomMode) {
+            setPan({ x: 0, y: 0 }); // Reset pan when zoom mode is disabled
+            setScale(1); // Reset scale when zoom mode is disabled
+        }
     };
 
     const handleMouseDown = (event) => {
@@ -163,6 +159,30 @@ const HomePage = () => {
         setIsPanning(false);
     };
 
+    const handleTouchStart = (event) => {
+        if (zoomMode) {
+            setIsPanning(true);
+            const touch = event.touches[0];
+            setStartPanPosition({ x: touch.clientX, y: touch.clientY });
+        }
+    };
+
+    const handleTouchMove = (event) => {
+        if (isPanning) {
+            const touch = event.touches[0];
+            setPan((prevPan) => ({
+                x: prevPan.x + (touch.clientX - startPanPosition.x),
+                y: prevPan.y + (touch.clientY - startPanPosition.y)
+            }));
+            setStartPanPosition({ x: touch.clientX, y: touch.clientY });
+            event.preventDefault();
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setIsPanning(false);
+    };
+
     return (
         <div className="drawing-container">
             <canvas
@@ -178,12 +198,16 @@ const HomePage = () => {
                 onMouseDownCapture={handleMouseDown}
                 onMouseMoveCapture={handleMouseMove}
                 onMouseUpCapture={handleMouseUp}
+                onTouchStartCapture={handleTouchStart}
+                onTouchMoveCapture={handleTouchMove}
+                onTouchEndCapture={handleTouchEnd}
                 className="drawing-canvas"
                 width={500}
                 height={500}
                 style={{
                     transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
                     transition: 'transform 0.1s',
+                    border: '1px solid black'
                 }}
             />
             <div className="control-buttons">
@@ -206,7 +230,6 @@ const HomePage = () => {
                     </div>
                 ))}
             </div>
-
             {loading && <h4>Loading more drawings...</h4>}
         </div>
     );
