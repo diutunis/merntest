@@ -39,7 +39,7 @@ const HomePage = () => {
             const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
             const data = await response.json();
 
-            // Ensure the data is an array before reversing
+            // Ensure the data is an array before processing
             if (Array.isArray(data)) {
                 setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
                 if (data.length < pageSize) {
@@ -66,7 +66,7 @@ const HomePage = () => {
             const touch = nativeEvent.touches[0];
             return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
         }
-        return { x: nativeEvent.offsetX, y: nativeEvent.offsetY };
+        return { x: nativeEvent.clientX - rect.left, y: nativeEvent.clientY - rect.top };
     };
 
     const startDrawing = (nativeEvent) => {
@@ -87,8 +87,7 @@ const HomePage = () => {
         context.stroke();
     };
 
-    const stopDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault(); // Prevent scroll on canvas interaction
+    const stopDrawing = () => {
         const context = canvasRef.current.getContext('2d');
         context.closePath();
         setIsDrawing(false);
