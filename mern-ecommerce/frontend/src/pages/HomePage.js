@@ -14,18 +14,19 @@ const HomePage = () => {
     const pageSize = 30; // Number of drawings per page
 
     useEffect(() => {
+        // Fetch initial set of drawings
         fetchDrawings(page);
 
-        // Prevent page scroll when drawing on the canvas
+        // Disable page scrolling when the user is drawing on the canvas
         const disableScroll = (e) => {
-            if (isDrawing) {
+            if (isDrawing && canvasRef.current && canvasRef.current.contains(e.target)) {
                 e.preventDefault();
             }
         };
 
         window.addEventListener('scroll', handleScroll);
         document.body.addEventListener('touchmove', disableScroll, { passive: false });
-        
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
             document.body.removeEventListener('touchmove', disableScroll);
@@ -34,20 +35,22 @@ const HomePage = () => {
 
     const fetchDrawings = async (pageNumber) => {
         setLoading(true);
-        const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
-        const data = await response.json();
-        setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
-        setLoading(false);
-
-        if (data.length < pageSize) {
-            setHasMore(false); // No more data to fetch
+        try {
+            const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
+            const data = await response.json();
+            setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
+            if (data.length < pageSize) {
+                setHasMore(false); // No more data to fetch
+            }
+        } catch (error) {
+            console.error('Error fetching drawings:', error);
         }
+        setLoading(false);
     };
 
     const handleScroll = () => {
-        if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && hasMore && !loading) {
-            fetchDrawings(page + 1);
-            setPage(page + 1);
+        if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 2 && hasMore && !loading) {
+            setPage((prevPage) => prevPage + 1);
         }
     };
 
@@ -92,7 +95,7 @@ const HomePage = () => {
 
     const saveDrawing = async () => {
         const drawing = canvasRef.current.toDataURL('image/png');
-        
+
         // Send drawing to backend
         const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
@@ -101,9 +104,9 @@ const HomePage = () => {
             },
             body: JSON.stringify({ drawing }),
         });
-        
+
         const savedDrawing = await response.json();
-        setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]); // Add new drawing on top
+        setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]); // Add new drawing at the top
         clearCanvas();
     };
 
