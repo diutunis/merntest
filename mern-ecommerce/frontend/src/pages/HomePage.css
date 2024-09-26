@@ -1,11 +1,45 @@
 .drawing-container {
-    position: relative;
+    
+display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+   position: relative;
 }
 
 .drawing-canvas {
     cursor: crosshair;
     touch-action: none; /* Disable default touch actions */
+    border: 1px solid black;
 }
+
+button {
+    margin: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.posted-drawings {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+
+
+.drawing-item img {
+    border: 2px solid black;
+    width: 150px;
+    height: 150px;
+margin: 10px;
+}
+
+
+
+
 
 .zoom-control {
     margin: 10px 0;
