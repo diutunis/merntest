@@ -125,22 +125,20 @@ const HomePage = () => {
     // Joystick for panning
     const handlePanChange = (direction) => {
         const panAmount = 10; // Adjust pan amount as needed
-        switch (direction) {
-            case 'up':
-                setPan((prev) => ({ x: prev.x, y: prev.y + panAmount }));
-                break;
-            case 'down':
-                setPan((prev) => ({ x: prev.x, y: prev.y - panAmount }));
-                break;
-            case 'left':
-                setPan((prev) => ({ x: prev.x + panAmount, y: prev.y }));
-                break;
-            case 'right':
-                setPan((prev) => ({ x: prev.x - panAmount, y: prev.y }));
-                break;
-            default:
-                break;
-        }
+        setPan((prev) => {
+            switch (direction) {
+                case 'up':
+                    return { x: prev.x, y: prev.y + panAmount };
+                case 'down':
+                    return { x: prev.x, y: prev.y - panAmount };
+                case 'left':
+                    return { x: prev.x + panAmount, y: prev.y };
+                case 'right':
+                    return { x: prev.x - panAmount, y: prev.y };
+                default:
+                    return prev;
+            }
+        });
     };
 
     useEffect(() => {
@@ -168,21 +166,31 @@ const HomePage = () => {
 
     return (
         <div className="drawing-container">
-            <canvas
-                ref={canvasRef}
-                onMouseDown={startDrawing}
-                onMouseMove={draw}
-                onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
-                className="drawing-canvas"
+            <div
+                className="canvas-wrapper"
                 style={{
-                    border: '1px solid black',
-                    width: '500px',  // Keep fixed width for visual consistency
-                    height: '500px', // Keep fixed height for visual consistency
-                    transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
-                    transformOrigin: 'top left',
+                    overflow: 'hidden', // Prevent overflow from zooming
+                    position: 'relative', // Relative positioning for child elements
+                    width: '500px', // Fixed width
+                    height: '500px', // Fixed height
                 }}
-            />
+            >
+                <canvas
+                    ref={canvasRef}
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    className="drawing-canvas"
+                    style={{
+                        border: '1px solid black',
+                        width: '500px',  // Keep fixed width for visual consistency
+                        height: '500px', // Keep fixed height for visual consistency
+                        transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
+                        transformOrigin: 'top left',
+                    }}
+                />
+            </div>
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
 
