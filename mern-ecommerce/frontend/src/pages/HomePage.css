@@ -1,15 +1,17 @@
 .drawing-container {
-    display: flex;
+    
+display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
+   position: relative;
 }
 
 .drawing-canvas {
-    border: 2px solid black;
     cursor: crosshair;
-    margin-bottom: 10px;
+    touch-action: none; /* Disable default touch actions */
+    border: 1px solid black;
 }
 
 button {

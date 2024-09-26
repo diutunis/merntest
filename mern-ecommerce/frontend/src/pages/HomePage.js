@@ -12,7 +12,7 @@ const HomePage = () => {
     const [hasMore, setHasMore] = useState(true);
     const pageSize = 30;
 
-    // Zoom and Pan state
+    // Zoom and Pan states
     const [scale, setScale] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [isPanning, setIsPanning] = useState(false);
@@ -44,7 +44,6 @@ const HomePage = () => {
         fetchDrawings();
     }, [page]);
 
-    // Load more drawings when scrolling reaches the bottom
     const handleScroll = () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
             setPage((prevPage) => prevPage + 1);
@@ -122,22 +121,21 @@ const HomePage = () => {
         );
     };
 
-    const preventScroll = (e) => {
-        if (isDrawing) {
-            e.preventDefault();
+    const toggleZoomMode = () => {
+        setZoomMode((prev) => !prev);
+        if (zoomMode) {
+            setScale(1); // Reset scale when disabling zoom
+            setPan({ x: 0, y: 0 }); // Reset pan when disabling zoom
         }
     };
 
-    useEffect(() => {
-        window.addEventListener('touchmove', preventScroll, { passive: false });
-        window.addEventListener('wheel', preventScroll, { passive: false });
-        return () => {
-            window.removeEventListener('touchmove', preventScroll);
-            window.removeEventListener('wheel', preventScroll);
-        };
-    }, [isDrawing]);
+    const handleWheel = (event) => {
+        if (!zoomMode) return;
+        event.preventDefault();
+        const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+        setScale((prevScale) => Math.max(0.5, Math.min(prevScale * zoomFactor, 4)));
+    };
 
-    // Zoom and pan handlers
     const handleMouseDown = (event) => {
         if (zoomMode) {
             setIsPanning(true);
@@ -183,20 +181,28 @@ const HomePage = () => {
         setIsPanning(false);
     };
 
-    const toggleZoomMode = () => {
-        setZoomMode((prev) => !prev);
-        if (zoomMode) {
-            setPan({ x: 0, y: 0 }); // Reset pan when disabling zoom
-            setScale(1); // Reset scale when disabling zoom
-        }
-    };
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
 
-    const handleWheel = (event) => {
-        if (!zoomMode) return; // Only zoom in zoom mode
-        event.preventDefault();
-        const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
-        setScale((prevScale) => Math.max(0.5, Math.min(prevScale * zoomFactor, 4)));
-    };
+        // Set context settings for drawing
+        context.lineWidth = 2; // Set line width
+        context.lineCap = 'round'; // Set line cap style
+        context.strokeStyle = 'black'; // Set default stroke color
+
+        // Resize the canvas to maintain aspect ratio
+        const resizeCanvas = () => {
+            const aspectRatio = 1; // Maintain a 1:1 aspect ratio
+            canvas.width = window.innerWidth < 500 ? window.innerWidth * 0.9 : 500;
+            canvas.height = canvas.width * aspectRatio;
+        };
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        return () => {
+            window.removeEventListener('resize', resizeCanvas);
+        };
+    }, []);
 
     return (
         <div className="drawing-container">
@@ -217,8 +223,6 @@ const HomePage = () => {
                 onTouchEndCapture={handleTouchEnd}
                 onWheel={handleWheel}
                 className="drawing-canvas"
-                width={500}
-                height={500}
                 style={{
                     border: '1px solid black',
                     transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
