@@ -65,7 +65,7 @@ const HomePage = () => {
 
     // Drawing functions
     const startDrawing = (nativeEvent) => {
-        if (zoomMode) return;
+        if (zoomMode) return; // Disable drawing while zooming
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -75,7 +75,7 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
-        if (zoomMode) return;
+        if (zoomMode) return; // Disable drawing while zooming
         nativeEvent.preventDefault();
         if (!isDrawing) return;
         const { x, y } = getPosition(nativeEvent);
@@ -85,7 +85,7 @@ const HomePage = () => {
     };
 
     const stopDrawing = (nativeEvent) => {
-        if (zoomMode) return;
+        if (zoomMode) return; // Disable drawing while zooming
         nativeEvent.preventDefault();
         if (!isDrawing) return;
         const context = canvasRef.current.getContext('2d');
@@ -124,7 +124,7 @@ const HomePage = () => {
 
     // Zoom functionality
     const handleWheel = (event) => {
-        if (!zoomMode) return;
+        if (!zoomMode) return; // Only allow zooming in zoom mode
         event.preventDefault();
         const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
         setScale((prevScale) => Math.max(0.5, Math.min(prevScale * zoomFactor, 4)));
