@@ -177,6 +177,8 @@ const HomePage = () => {
                 className="drawing-canvas"
                 style={{
                     border: '1px solid black',
+                    width: '500px',  // Keep fixed width for visual consistency
+                    height: '500px', // Keep fixed height for visual consistency
                     transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
                     transformOrigin: 'top left',
                 }}
