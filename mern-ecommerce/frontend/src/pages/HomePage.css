@@ -2,33 +2,34 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px;
+    position: relative;
 }
 
 .drawing-canvas {
-    border: 2px solid black;
-    cursor: crosshair;
-    margin-bottom: 10px;
+    border: 1px solid black;
+    margin-bottom: 20px; /* Adds space between the canvas and the buttons */
 }
 
-button {
-    margin: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+.control-buttons {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+    margin-bottom: 20px; /* Space below the buttons */
 }
 
 .posted-drawings {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
+    flex-direction: column; /* Stack drawings vertically */
+    align-items: center; /* Center drawings */
+    max-width: 500px; /* Max width for drawings */
+    overflow-y: auto; /* Allow scrolling if too many drawings */
+    margin-top: 20px; /* Space above drawings */
 }
 
 .drawing-item {
-    margin: 10px;
+    margin-bottom: 10px; /* Space between drawings */
+    width: 100%; /* Make each drawing fill the width */
 }
+
 
 .drawing-item img {
     border: 2px solid black;

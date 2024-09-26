@@ -13,7 +13,7 @@ const HomePage = () => {
     const pageSize = 30; 
     const [scale, setScale] = useState(1); 
     const [lastTouchDistance, setLastTouchDistance] = useState(null); 
-    const [zoomMode, setZoomMode] = useState(false); // Toggle for zoom mode
+    const [zoomMode, setZoomMode] = useState(false); 
     const [offsetX, setOffsetX] = useState(0);
     const [offsetY, setOffsetY] = useState(0);
 
@@ -201,12 +201,13 @@ const HomePage = () => {
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 style={{ transform: `scale(${scale}) translate(${offsetX}px, ${offsetY}px)` }}
             />
-            <button onClick={saveDrawing}>Post</button>
-            <button onClick={clearCanvas}>Clear</button>
-            <button onClick={toggleZoomMode}>
-                {zoomMode ? 'Disable Zoom' : 'Enable Zoom'}
-            </button>
-
+            <div className="control-buttons">
+                <button onClick={saveDrawing}>Post</button>
+                <button onClick={clearCanvas}>Clear</button>
+                <button onClick={toggleZoomMode}>
+                    {zoomMode ? 'Disable Zoom' : 'Enable Zoom'}
+                </button>
+            </div>
             <div className="posted-drawings">
                 {drawings.map((drawing, index) => (
                     <div key={drawing._id} className="drawing-item">
