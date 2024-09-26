@@ -33,26 +33,38 @@ const HomePage = () => {
         };
     }, [isDrawing, page]);
 
-    const fetchDrawings = async (pageNumber) => {
-        setLoading(true);
-        try {
-            const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
-            const data = await response.json();
+   const fetchDrawings = async (pageNumber) => {
+    setLoading(true);
+    try {
+        const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
+        const data = await response.json();
 
-            // Ensure the data is an array before processing
-            if (Array.isArray(data)) {
-                setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
-                if (data.length < pageSize) {
-                    setHasMore(false); // No more data to fetch
-                }
-            } else {
-                console.error("Data returned is not an array:", data);
-            }
-        } catch (error) {
-            console.error('Error fetching drawings:', error);
+        let newDrawings = [];
+        
+        // Check if data is an array or an object
+        if (Array.isArray(data)) {
+            newDrawings = data;
+        } else if (typeof data === 'object' && data.drawings) {
+            // If data is an object, extract the drawings from the `drawings` field
+            newDrawings = data.drawings;
+        } else {
+            console.error("Unexpected data format:", data);
+            return;
         }
-        setLoading(false);
-    };
+
+        // Reverse and append new drawings to the state
+        setDrawings((prevDrawings) => [...prevDrawings, ...newDrawings.reverse()]);
+
+        // If the number of new drawings is less than pageSize, assume no more drawings
+        if (newDrawings.length < pageSize) {
+            setHasMore(false);
+        }
+    } catch (error) {
+        console.error('Error fetching drawings:', error);
+    }
+    setLoading(false);
+};
+
 
     const handleScroll = () => {
         if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 2 && hasMore && !loading) {
