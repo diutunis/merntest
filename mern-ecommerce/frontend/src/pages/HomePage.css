@@ -1,39 +1,24 @@
 .drawing-container {
-    
-display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-   position: relative;
+    position: relative;
 }
 
 .drawing-canvas {
     cursor: crosshair;
     touch-action: none; /* Disable default touch actions */
-    border: 1px solid black;
 }
 
-button {
-    margin: 5px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+.zoom-control {
+    margin: 10px 0;
 }
 
-.posted-drawings {
+.joystick-container {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 20px;
+    flex-direction: column;
+    align-items: center;
 }
 
-.drawing-item {
-    margin: 10px;
-}
-
-.drawing-item img {
-    border: 2px solid black;
-    width: 150px;
-    height: 150px;
+.joystick-container button {
+    margin: 2px;
+    width: 40px;
+    height: 40px;
 }
