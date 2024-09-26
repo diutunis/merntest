@@ -7,15 +7,14 @@ const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
-    const [page, setPage] = useState(1); 
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const pageSize = 30;
 
     const [scale, setScale] = useState(1); // For zoom level
-    const [lastDistance, setLastDistance] = useState(null); // To store the last pinch distance
-    const [offsetX, setOffsetX] = useState(0); // To track canvas offset for zooming
-    const [offsetY, setOffsetY] = useState(0); 
+    const [lastDistance, setLastDistance] = useState(null); // Pinch zoom distance
+    const [isPinching, setIsPinching] = useState(false); // To know if a pinch-zoom is occurring
 
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
@@ -60,6 +59,7 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
+    // Get the position on the canvas (mouse or touch)
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         if (nativeEvent.touches && nativeEvent.touches.length === 1) {
@@ -71,7 +71,8 @@ const HomePage = () => {
     };
 
     const startDrawing = (nativeEvent) => {
-        if (nativeEvent.touches && nativeEvent.touches.length > 1) return; // Ignore multi-touch for drawing
+        // Prevent drawing during pinch-zoom
+        if (nativeEvent.touches && nativeEvent.touches.length > 1) return;
         nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
@@ -81,7 +82,7 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
-        if (!isDrawing || (nativeEvent.touches && nativeEvent.touches.length > 1)) return; // Ignore multi-touch for drawing
+        if (!isDrawing || (nativeEvent.touches && nativeEvent.touches.length > 1)) return; 
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -128,11 +129,12 @@ const HomePage = () => {
         );
     };
 
-    // Pinch to zoom handling
+    // Pinch to zoom functionality
     const handlePinchStart = (e) => {
         if (e.touches.length === 2) {
             const distance = getDistanceBetweenTouches(e.touches);
             setLastDistance(distance);
+            setIsPinching(true); // Indicate pinch gesture is in progress
         }
     };
 
@@ -141,15 +143,13 @@ const HomePage = () => {
             const distance = getDistanceBetweenTouches(e.touches);
             const scaleFactor = distance / lastDistance;
 
-            setScale((prevScale) => Math.min(Math.max(prevScale * scaleFactor, 0.5), 4)); // Limit zoom between 0.5x and 4x
+            setScale((prevScale) => Math.min(Math.max(prevScale * scaleFactor, 0.5), 4)); // Zoom between 0.5x and 4x
             setLastDistance(distance);
-
-            const context = canvasRef.current.getContext('2d');
-            context.setTransform(scale, 0, 0, scale, offsetX, offsetY);
         }
     };
 
     const handlePinchEnd = () => {
+        setIsPinching(false);
         setLastDistance(null);
     };
 
@@ -161,21 +161,6 @@ const HomePage = () => {
         return Math.sqrt(dx * dx + dy * dy);
     };
 
-    // This function prevents the default behavior to stop the page from scrolling during drawing or touch input
-    const preventScroll = (e) => {
-        e.preventDefault();
-    };
-
-    useEffect(() => {
-        window.addEventListener('touchmove', preventScroll, { passive: false });
-        window.addEventListener('wheel', preventScroll, { passive: false });
-
-        return () => {
-            window.removeEventListener('touchmove', preventScroll);
-            window.removeEventListener('wheel', preventScroll);
-        };
-    }, [isDrawing]);
-
     return (
         <div className="drawing-container">
             <canvas
@@ -184,17 +169,13 @@ const HomePage = () => {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
-                onTouchStart={startDrawing} // Start drawing on single touch
-                onTouchMove={draw} // Continue drawing on touch move
-                onTouchEnd={stopDrawing} // Stop drawing on touch end
-                onTouchCancel={stopDrawing}
-                onTouchStart={handlePinchStart} // Pinch zoom handling
-                onTouchMove={handlePinchMove}
-                onTouchEnd={handlePinchEnd}
+                onTouchStart={(e) => isPinching ? handlePinchStart(e) : startDrawing(e)} // Only start drawing if not pinching
+                onTouchMove={(e) => isPinching ? handlePinchMove(e) : draw(e)}
+                onTouchEnd={(e) => isPinching ? handlePinchEnd() : stopDrawing(e)}
                 className="drawing-canvas"
                 width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
-                style={{ transform: `scale(${scale})` }} // Applying scale for zoom
+                style={{ transform: `scale(${scale})` }} // Apply zoom scale
             />
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
@@ -211,7 +192,7 @@ const HomePage = () => {
                 ))}
             </div>
 
-            {loading && <h4>Loading more drawings...</h4>}
+            {loading && <h4>Loading...</h4>}
         </div>
     );
 };
