@@ -38,9 +38,15 @@ const HomePage = () => {
         try {
             const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
             const data = await response.json();
-            setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
-            if (data.length < pageSize) {
-                setHasMore(false); // No more data to fetch
+
+            // Ensure the data is an array before reversing
+            if (Array.isArray(data)) {
+                setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
+                if (data.length < pageSize) {
+                    setHasMore(false); // No more data to fetch
+                }
+            } else {
+                console.error("Data returned is not an array:", data);
             }
         } catch (error) {
             console.error('Error fetching drawings:', error);
