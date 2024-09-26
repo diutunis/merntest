@@ -7,48 +7,50 @@ const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
-    const [page, setPage] = useState(1); // Page number for pagination
-    const [hasMore, setHasMore] = useState(true); // To control fetching more drawings
+    const [page, setPage] = useState(1); // For pagination
+    const [loading, setLoading] = useState(false);
+    const [hasMore, setHasMore] = useState(true); // If more drawings can be fetched
+
     const pageSize = 30; // Number of drawings per page
 
     useEffect(() => {
-        // Fetch initial drawings (first page)
         fetchDrawings(page);
 
-        // Disable scroll on the entire body when touch events are happening on the canvas
+        // Prevent page scroll when drawing on the canvas
         const disableScroll = (e) => {
-            if (e.target === canvasRef.current) {
+            if (isDrawing) {
                 e.preventDefault();
             }
         };
 
+        window.addEventListener('scroll', handleScroll);
         document.body.addEventListener('touchmove', disableScroll, { passive: false });
+        
         return () => {
+            window.removeEventListener('scroll', handleScroll);
             document.body.removeEventListener('touchmove', disableScroll);
         };
-    }, []);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && hasMore) {
-                fetchDrawings(page + 1);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [page, hasMore]);
+    }, [isDrawing, page]);
 
     const fetchDrawings = async (pageNumber) => {
+        setLoading(true);
         const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${pageNumber}&limit=${pageSize}`);
         const data = await response.json();
-        if (data.length < pageSize) {
-            setHasMore(false);
-        }
         setDrawings((prevDrawings) => [...prevDrawings, ...data.reverse()]);
-        setPage(pageNumber);
+        setLoading(false);
+
+        if (data.length < pageSize) {
+            setHasMore(false); // No more data to fetch
+        }
     };
 
-    // Function to get touch or mouse position relative to canvas
+    const handleScroll = () => {
+        if (window.innerHeight + document.documentElement.scrollTop === document.documentElement.offsetHeight && hasMore && !loading) {
+            fetchDrawings(page + 1);
+            setPage(page + 1);
+        }
+    };
+
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         if (nativeEvent.touches) {
@@ -59,7 +61,7 @@ const HomePage = () => {
     };
 
     const startDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault();  // Prevent scrolling
+        nativeEvent.preventDefault(); // Prevent scroll on canvas interaction
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.beginPath();
@@ -68,7 +70,7 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
-        nativeEvent.preventDefault();  // Prevent scrolling
+        nativeEvent.preventDefault(); // Prevent scroll on canvas interaction
         if (!isDrawing) return;
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -77,8 +79,7 @@ const HomePage = () => {
     };
 
     const stopDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault();  // Prevent scrolling
-        if (!isDrawing) return;
+        nativeEvent.preventDefault(); // Prevent scroll on canvas interaction
         const context = canvasRef.current.getContext('2d');
         context.closePath();
         setIsDrawing(false);
@@ -92,17 +93,17 @@ const HomePage = () => {
     const saveDrawing = async () => {
         const drawing = canvasRef.current.toDataURL('image/png');
         
-        // Send the drawing to the backend
+        // Send drawing to backend
         const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ drawing }),  // Remove likes from here; the backend should set it to 0
+            body: JSON.stringify({ drawing }),
         });
         
         const savedDrawing = await response.json();
-        setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]);  // Add new drawing at the top
+        setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]); // Add new drawing on top
         clearCanvas();
     };
 
@@ -142,12 +143,16 @@ const HomePage = () => {
                     <div key={drawing._id} className="drawing-item">
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
-                            <button onClick={() => handleLike(drawing._id)}><FontAwesomeIcon icon={faHandSparkles} /></button>
+                            <button onClick={() => handleLike(drawing._id)}>
+                                <FontAwesomeIcon icon={faHandSparkles} />
+                            </button>
                             <span>{drawing.likes || 0}</span>
                         </div>
                     </div>
                 ))}
             </div>
+
+            {loading && <div>Loading more drawings...</div>}
         </div>
     );
 };
