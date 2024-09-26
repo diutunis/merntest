@@ -3,35 +3,30 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    width: 100%; /* Full width for better responsiveness */
+    width: 100%;
 }
 
 .drawing-canvas {
     border: 1px solid black;
-    margin: 0 auto; /* Center the canvas */
-    display: block; /* Allow margins to work properly */
+    margin: 0 auto;
+    display: block;
 }
 
 .control-buttons {
     display: flex;
-    justify-content: center; /* Center the buttons */
-    gap: 10px; /* Space between buttons */
-    margin: 10px 0; /* Adjust margin for better spacing */
+    justify-content: center;
+    margin-top: 10px;
 }
 
 .posted-drawings {
+    margin-top: 20px;
     display: flex;
-    flex-direction: column; /* Stack drawings vertically */
-    align-items: center; /* Center drawings */
-    width: 100%; /* Make drawings take full width */
-    max-width: 500px; /* Limit max width */
-    overflow-y: auto; /* Allow scrolling if too many drawings */
-    margin-top: 20px; /* Space above drawings */
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .drawing-item {
-    margin-bottom: 10px; /* Space between drawings */
-    width: 100%; /* Make each drawing fill the width */
+    margin: 5px;
 }
 
 

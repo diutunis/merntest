@@ -12,10 +12,10 @@ const HomePage = () => {
     const [hasMore, setHasMore] = useState(true);
     const pageSize = 30;
     const [scale, setScale] = useState(1);
-    const [lastTouchDistance, setLastTouchDistance] = useState(null);
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [isPanning, setIsPanning] = useState(false);
+    const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
     const [zoomMode, setZoomMode] = useState(false);
-    const [offsetX, setOffsetX] = useState(0);
-    const [offsetY, setOffsetY] = useState(0);
 
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
@@ -63,35 +63,34 @@ const HomePage = () => {
 
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
-        if (nativeEvent.touches) {
-            const touch = nativeEvent.touches[0];
-            return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-        }
-        return { x: nativeEvent.offsetX, y: nativeEvent.offsetY };
+        return {
+            x: nativeEvent.clientX - rect.left - pan.x,
+            y: nativeEvent.clientY - rect.top - pan.y
+        };
     };
 
     const startDrawing = (nativeEvent) => {
-        if (zoomMode) return; // Prevent drawing in zoom mode
+        if (zoomMode) return;
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.beginPath();
-        context.moveTo((x - offsetX) / scale, (y - offsetY) / scale);
+        context.moveTo(x, y);
         setIsDrawing(true);
     };
 
     const draw = (nativeEvent) => {
-        if (zoomMode) return; // Prevent drawing in zoom mode
+        if (zoomMode) return;
         nativeEvent.preventDefault();
         if (!isDrawing) return;
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
-        context.lineTo((x - offsetX) / scale, (y - offsetY) / scale);
+        context.lineTo(x, y);
         context.stroke();
     };
 
     const stopDrawing = (nativeEvent) => {
-        if (zoomMode) return; // Prevent drawing in zoom mode
+        if (zoomMode) return;
         nativeEvent.preventDefault();
         if (!isDrawing) return;
         const context = canvasRef.current.getContext('2d');
@@ -132,29 +131,6 @@ const HomePage = () => {
         );
     };
 
-    const handleTouchStart = (event) => {
-        if (!zoomMode || event.touches.length !== 2) return;
-        const distance = Math.hypot(
-            event.touches[0].clientX - event.touches[1].clientX,
-            event.touches[0].clientY - event.touches[1].clientY
-        );
-        setLastTouchDistance(distance);
-    };
-
-    const handleTouchMove = (event) => {
-        if (!zoomMode || event.touches.length !== 2 || !lastTouchDistance) return;
-        const distance = Math.hypot(
-            event.touches[0].clientX - event.touches[1].clientX,
-            event.touches[0].clientY - event.touches[1].clientY
-        );
-        const scaleFactor = distance / lastTouchDistance;
-
-        setScale((prevScale) => Math.max(0.5, Math.min(prevScale * scaleFactor, 4)));
-        setLastTouchDistance(distance);
-
-        event.preventDefault();
-    };
-
     const handleWheel = (event) => {
         if (!zoomMode) return;
         event.preventDefault();
@@ -162,21 +138,29 @@ const HomePage = () => {
         setScale((prevScale) => Math.max(0.5, Math.min(prevScale * zoomFactor, 4)));
     };
 
-    const preventScroll = (event) => {
-        if (event.target === canvasRef.current) {
-            event.preventDefault();
+    const toggleZoomMode = () => {
+        setZoomMode(!zoomMode);
+    };
+
+    const handleMouseDown = (event) => {
+        if (zoomMode) {
+            setIsPanning(true);
+            setStartPanPosition({ x: event.clientX, y: event.clientY });
         }
     };
 
-    useEffect(() => {
-        document.body.addEventListener('touchmove', preventScroll, { passive: false });
-        return () => {
-            document.body.removeEventListener('touchmove', preventScroll);
-        };
-    }, []);
+    const handleMouseMove = (event) => {
+        if (isPanning) {
+            setPan((prevPan) => ({
+                x: prevPan.x + (event.clientX - startPanPosition.x),
+                y: prevPan.y + (event.clientY - startPanPosition.y)
+            }));
+            setStartPanPosition({ x: event.clientX, y: event.clientY });
+        }
+    };
 
-    const toggleZoomMode = () => {
-        setZoomMode(!zoomMode);
+    const handleMouseUp = () => {
+        setIsPanning(false);
     };
 
     return (
@@ -190,14 +174,15 @@ const HomePage = () => {
                 onTouchStart={startDrawing}
                 onTouchMove={draw}
                 onTouchEnd={stopDrawing}
-                onTouchStartCapture={handleTouchStart}
-                onTouchMoveCapture={handleTouchMove}
                 onWheel={handleWheel}
+                onMouseDownCapture={handleMouseDown}
+                onMouseMoveCapture={handleMouseMove}
+                onMouseUpCapture={handleMouseUp}
                 className="drawing-canvas"
                 width={500}
                 height={500}
                 style={{
-                    transform: `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`,
+                    transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
                     transition: 'transform 0.1s',
                 }}
             />
