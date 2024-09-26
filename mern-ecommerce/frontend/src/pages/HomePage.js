@@ -72,11 +72,11 @@ const HomePage = () => {
 
     const startDrawing = (nativeEvent) => {
         nativeEvent.preventDefault();
+        setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.beginPath();
         context.moveTo(x, y);
-        setIsDrawing(true);
     };
 
     const draw = (nativeEvent) => {
@@ -91,9 +91,9 @@ const HomePage = () => {
     const stopDrawing = (nativeEvent) => {
         nativeEvent.preventDefault();
         if (!isDrawing) return;
+        setIsDrawing(false);
         const context = canvasRef.current.getContext('2d');
         context.closePath();
-        setIsDrawing(false);
     };
 
     const clearCanvas = () => {
@@ -128,6 +128,24 @@ const HomePage = () => {
             )
         );
     };
+
+    // Disable scroll while drawing
+    const preventScroll = (e) => {
+        if (isDrawing) {
+            e.preventDefault();
+        }
+    };
+
+    useEffect(() => {
+        // Prevent scroll on touchmove and mousewheel events when drawing
+        window.addEventListener('touchmove', preventScroll, { passive: false });
+        window.addEventListener('wheel', preventScroll, { passive: false });
+
+        return () => {
+            window.removeEventListener('touchmove', preventScroll);
+            window.removeEventListener('wheel', preventScroll);
+        };
+    }, [isDrawing]);
 
     return (
         <div className="drawing-container">
