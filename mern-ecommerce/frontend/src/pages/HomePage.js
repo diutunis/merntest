@@ -161,6 +161,11 @@ const HomePage = () => {
         return Math.sqrt(dx * dx + dy * dy);
     };
 
+    // This function prevents the default behavior to stop the page from scrolling during drawing or touch input
+    const preventScroll = (e) => {
+        e.preventDefault();
+    };
+
     useEffect(() => {
         window.addEventListener('touchmove', preventScroll, { passive: false });
         window.addEventListener('wheel', preventScroll, { passive: false });
