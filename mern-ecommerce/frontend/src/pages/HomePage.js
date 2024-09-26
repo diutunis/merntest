@@ -62,15 +62,16 @@ const HomePage = () => {
 
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
-        if (nativeEvent.touches && nativeEvent.touches.length > 0) {
+        if (nativeEvent.touches && nativeEvent.touches.length === 1) {
             const touch = nativeEvent.touches[0];
             return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
-        } else {
+        } else if (!nativeEvent.touches) {
             return { x: nativeEvent.clientX - rect.left, y: nativeEvent.clientY - rect.top };
         }
     };
 
     const startDrawing = (nativeEvent) => {
+        if (nativeEvent.touches && nativeEvent.touches.length > 1) return; // Ignore multi-touch for drawing
         nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
@@ -80,7 +81,7 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
-        if (!isDrawing) return;
+        if (!isDrawing || (nativeEvent.touches && nativeEvent.touches.length > 1)) return; // Ignore multi-touch for drawing
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -143,7 +144,6 @@ const HomePage = () => {
             setScale((prevScale) => Math.min(Math.max(prevScale * scaleFactor, 0.5), 4)); // Limit zoom between 0.5x and 4x
             setLastDistance(distance);
 
-            // Update the canvas transformation based on the new scale
             const context = canvasRef.current.getContext('2d');
             context.setTransform(scale, 0, 0, scale, offsetX, offsetY);
         }
@@ -184,11 +184,13 @@ const HomePage = () => {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
-                onTouchStart={handlePinchStart}
+                onTouchStart={startDrawing} // Start drawing on single touch
+                onTouchMove={draw} // Continue drawing on touch move
+                onTouchEnd={stopDrawing} // Stop drawing on touch end
+                onTouchCancel={stopDrawing}
+                onTouchStart={handlePinchStart} // Pinch zoom handling
                 onTouchMove={handlePinchMove}
                 onTouchEnd={handlePinchEnd}
-                onTouchCancel={stopDrawing}
-                onTouchMove={draw}
                 className="drawing-canvas"
                 width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
                 height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
