@@ -15,9 +15,6 @@ const HomePage = () => {
     // Zoom and Pan states
     const [scale, setScale] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
-    const [isPanning, setIsPanning] = useState(false);
-    const [zoomMode, setZoomMode] = useState(false);
-    const [startPanPosition, setStartPanPosition] = useState({ x: 0, y: 0 });
 
     // Function to fetch drawings with pagination
     const fetchDrawings = async () => {
@@ -64,7 +61,6 @@ const HomePage = () => {
     };
 
     const startDrawing = (nativeEvent) => {
-        if (zoomMode) return;
         nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
@@ -74,7 +70,7 @@ const HomePage = () => {
     };
 
     const draw = (nativeEvent) => {
-        if (!isDrawing || zoomMode) return;
+        if (!isDrawing) return;
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -121,64 +117,30 @@ const HomePage = () => {
         );
     };
 
-    const toggleZoomMode = () => {
-        setZoomMode((prev) => !prev);
-        if (zoomMode) {
-            setScale(1); // Reset scale when disabling zoom
-            setPan({ x: 0, y: 0 }); // Reset pan when disabling zoom
+    // Slider for zoom control
+    const handleZoomChange = (event) => {
+        setScale(event.target.value);
+    };
+
+    // Joystick for panning
+    const handlePanChange = (direction) => {
+        const panAmount = 10; // Adjust pan amount as needed
+        switch (direction) {
+            case 'up':
+                setPan((prev) => ({ x: prev.x, y: prev.y + panAmount }));
+                break;
+            case 'down':
+                setPan((prev) => ({ x: prev.x, y: prev.y - panAmount }));
+                break;
+            case 'left':
+                setPan((prev) => ({ x: prev.x + panAmount, y: prev.y }));
+                break;
+            case 'right':
+                setPan((prev) => ({ x: prev.x - panAmount, y: prev.y }));
+                break;
+            default:
+                break;
         }
-    };
-
-    const handleWheel = (event) => {
-        if (!zoomMode) return;
-        event.preventDefault();
-        const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
-        setScale((prevScale) => Math.max(0.5, Math.min(prevScale * zoomFactor, 4)));
-    };
-
-    const handleMouseDown = (event) => {
-        if (zoomMode) {
-            setIsPanning(true);
-            setStartPanPosition({ x: event.clientX, y: event.clientY });
-        }
-    };
-
-    const handleMouseMove = (event) => {
-        if (isPanning) {
-            setPan((prevPan) => ({
-                x: prevPan.x + (event.clientX - startPanPosition.x),
-                y: prevPan.y + (event.clientY - startPanPosition.y),
-            }));
-            setStartPanPosition({ x: event.clientX, y: event.clientY });
-        }
-    };
-
-    const handleMouseUp = () => {
-        setIsPanning(false);
-    };
-
-    const handleTouchStart = (event) => {
-        if (zoomMode) {
-            setIsPanning(true);
-            const touch = event.touches[0];
-            setStartPanPosition({ x: touch.clientX, y: touch.clientY });
-        }
-    };
-
-    const handleTouchMove = (event) => {
-        if (isPanning) {
-            const touch = event.touches[0];
-            setPan((prevPan) => ({
-                x: prevPan.x + (touch.clientX - startPanPosition.x),
-                y: prevPan.y + (touch.clientY - startPanPosition.y),
-            }));
-            setStartPanPosition({ x: touch.clientX, y: touch.clientY });
-            event.preventDefault();
-        }
-    };
-
-    const handleTouchEnd = () => {
-        setIsPanning(false);
     };
 
     useEffect(() => {
@@ -212,27 +174,37 @@ const HomePage = () => {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
-                onTouchStart={startDrawing}
-                onTouchMove={draw}
-                onTouchEnd={stopDrawing}
-                onMouseDownCapture={handleMouseDown}
-                onMouseMoveCapture={handleMouseMove}
-                onMouseUpCapture={handleMouseUp}
-                onTouchStartCapture={handleTouchStart}
-                onTouchMoveCapture={handleTouchMove}
-                onTouchEndCapture={handleTouchEnd}
-                onWheel={handleWheel}
                 className="drawing-canvas"
                 style={{
                     border: '1px solid black',
                     transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
                     transformOrigin: 'top left',
-                    transition: 'transform 0.1s',
                 }}
             />
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
-            <button onClick={toggleZoomMode}>{zoomMode ? 'Disable Zoom' : 'Enable Zoom'}</button>
+
+            {/* Zoom Slider */}
+            <div className="zoom-control">
+                <label htmlFor="zoom-slider">Zoom: </label>
+                <input
+                    id="zoom-slider"
+                    type="range"
+                    min="1"
+                    max="4"
+                    step="0.1"
+                    value={scale}
+                    onChange={handleZoomChange}
+                />
+            </div>
+
+            {/* Joystick for panning */}
+            <div className="joystick-container">
+                <button onClick={() => handlePanChange('up')}>↑</button>
+                <button onClick={() => handlePanChange('left')}>←</button>
+                <button onClick={() => handlePanChange('down')}>↓</button>
+                <button onClick={() => handlePanChange('right')}>→</button>
+            </div>
 
             <div className="posted-drawings">
                 {drawings.map((drawing, index) => (
