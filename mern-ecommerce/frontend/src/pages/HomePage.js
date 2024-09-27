@@ -55,13 +55,14 @@ const HomePage = () => {
     // Canvas drawing functionality
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
-        const x = (nativeEvent.clientX - rect.left - pan.x) / scale;
-        const y = (nativeEvent.clientY - rect.top - pan.y) / scale;
+        const event = nativeEvent.touches ? nativeEvent.touches[0] : nativeEvent; // Handle touch and mouse events
+        const x = (event.clientX - rect.left - pan.x) / scale;
+        const y = (event.clientY - rect.top - pan.y) / scale;
         return { x, y };
     };
 
     const startDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault();
+        nativeEvent.preventDefault(); // Prevent scrolling and other default actions
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -71,7 +72,7 @@ const HomePage = () => {
 
     const draw = (nativeEvent) => {
         if (!isDrawing) return;
-        nativeEvent.preventDefault();
+        nativeEvent.preventDefault(); // Prevent scrolling and other default actions
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.lineTo(x, y);
@@ -145,14 +146,12 @@ const HomePage = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
 
-        // Set context settings for drawing
         context.lineWidth = 2; // Set line width
         context.lineCap = 'round'; // Set line cap style
         context.strokeStyle = 'black'; // Set default stroke color
 
-        // Resize the canvas to maintain aspect ratio
         const resizeCanvas = () => {
-            const aspectRatio = 1; // Maintain a 1:1 aspect ratio
+            const aspectRatio = 1;
             canvas.width = window.innerWidth < 500 ? window.innerWidth * 0.9 : 500;
             canvas.height = canvas.width * aspectRatio;
         };
@@ -181,9 +180,8 @@ const HomePage = () => {
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}
                     onMouseLeave={stopDrawing}
-                    // Correct touch event handlers
-                    onTouchStart={(e) => startDrawing(e.touches[0])}
-                    onTouchMove={(e) => draw(e.touches[0])}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
                     onTouchEnd={stopDrawing}
                     className="drawing-canvas"
                     style={{
