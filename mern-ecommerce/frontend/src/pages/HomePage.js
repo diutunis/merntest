@@ -142,6 +142,13 @@ const HomePage = () => {
         });
     };
 
+    // Prevent scrolling when drawing
+    const preventScroll = (e) => {
+        if (isDrawing) {
+            e.preventDefault();
+        }
+    };
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
@@ -158,10 +165,17 @@ const HomePage = () => {
 
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+
+        // Use passive: false to allow preventDefault on touchmove events
+        window.addEventListener('touchmove', preventScroll, { passive: false });
+        window.addEventListener('wheel', preventScroll, { passive: false });
+
         return () => {
             window.removeEventListener('resize', resizeCanvas);
+            window.removeEventListener('touchmove', preventScroll);
+            window.removeEventListener('wheel', preventScroll);
         };
-    }, []);
+    }, [isDrawing]);
 
     return (
         <div className="drawing-container">
