@@ -181,14 +181,15 @@ const HomePage = () => {
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}
                     onMouseLeave={stopDrawing}
-                    onTouchStart={(e) => startDrawing(e.touches[0])}  // Correctly handle touch events
-                    onTouchMove={(e) => draw(e.touches[0])}  // Correctly handle touch events
+                    // Correct touch event handlers
+                    onTouchStart={(e) => startDrawing(e.touches[0])}
+                    onTouchMove={(e) => draw(e.touches[0])}
                     onTouchEnd={stopDrawing}
                     className="drawing-canvas"
                     style={{
                         border: '1px solid black',
-                        width: '500px',  // Keep fixed width for visual consistency
-                        height: '500px', // Keep fixed height for visual consistency
+                        width: '500px',
+                        height: '500px',
                         transform: `scale(${scale}) translate(${pan.x}px, ${pan.y}px)`,
                         transformOrigin: 'top left',
                     }}
