@@ -181,8 +181,8 @@ const HomePage = () => {
                     onMouseMove={draw}
                     onMouseUp={stopDrawing}
                     onMouseLeave={stopDrawing}
-                    onTouchStart={(e) => startDrawing(e.touches[0])}  // Adjust for touch event
-                    onTouchMove={(e) => draw(e.touches[0])}  // Adjust for touch event
+                    onTouchStart={(e) => startDrawing(e.touches[0])}  // Correctly handle touch events
+                    onTouchMove={(e) => draw(e.touches[0])}  // Correctly handle touch events
                     onTouchEnd={stopDrawing}
                     className="drawing-canvas"
                     style={{
