@@ -1,69 +1,10 @@
-import React, { useEffect, useRef } from 'react';
-import './BlogPage.css'; // Ensure you have appropriate styles for the bubble and PDF container
+import React from 'react';
+import './BlogPage.css'; // Ensure you have appropriate styles for the PDF container
 
 const BlogPage = () => {
-    const bubbleRefs = useRef([]);
-
-    useEffect(() => {
-        const bubbles = bubbleRefs.current;
-        const screenWidth = window.innerWidth;
-        const screenHeight = window.innerHeight;
-
-        const directions = bubbles.map(() => ({
-            x: Math.random() > 0.5 ? 1 : -1,
-            y: Math.random() > 0.5 ? 1 : -1,
-            speed: Math.random() * 3 + 1,
-        }));
-
-        const moveBubbles = () => {
-            bubbles.forEach((bubble, index) => {
-                const rect = bubble.getBoundingClientRect();
-                let newLeft = rect.left + directions[index].speed * directions[index].x;
-                let newTop = rect.top + directions[index].speed * directions[index].y;
-
-                // Reverse direction if hitting the edges
-                if (newLeft <= 0 || newLeft + rect.width >= screenWidth) {
-                    directions[index].x *= -1;
-                }
-                if (newTop <= 0 || newTop + rect.height >= screenHeight) {
-                    directions[index].y *= -1;
-                }
-
-                // Update position
-                bubble.style.left = `${newLeft}px`;
-                bubble.style.top = `${newTop}px`;
-            });
-
-            requestAnimationFrame(moveBubbles);
-        };
-
-        moveBubbles();
-    }, []);
-
-    const renderBubbles = () => {
-        return new Array(10).fill(null).map((_, index) => (
-            <div
-                key={index}
-                ref={(el) => (bubbleRefs.current[index] = el)}
-                className="bubble"
-                style={{
-                    position: 'absolute',
-                    left: `${Math.random() * window.innerWidth}px`,
-                    top: `${Math.random() * window.innerHeight}px`,
-                    width: `${50 + Math.random() * 50}px`,
-                    height: `${50 + Math.random() * 50}px`,
-                    borderRadius: '50%',
-                }}
-            />
-        ));
-    };
 
     return (
         <>
-            <div className="container" id="container">
-                {renderBubbles()}
-            </div>
-
             <section className="container" id="about">
                 <h1>Something I may consume, the dark.</h1>
                 <p>
@@ -116,5 +57,3 @@ const BlogPage = () => {
 };
 
 export default BlogPage;
-
-
