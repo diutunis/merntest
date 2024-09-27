@@ -149,33 +149,41 @@ const HomePage = () => {
         }
     };
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const context = canvas.getContext('2d');
+ useEffect(() => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
 
-        context.lineWidth = 2; // Set line width
-        context.lineCap = 'round'; // Set line cap style
-        context.strokeStyle = 'black'; // Set default stroke color
+    context.lineWidth = 2; // Set line width
+    context.lineCap = 'round'; // Set line cap style
+    context.strokeStyle = 'black'; // Set default stroke color
 
-        const resizeCanvas = () => {
-            const aspectRatio = 1;
-            canvas.width = window.innerWidth < 500 ? window.innerWidth * 0.9 : 500;
-            canvas.height = canvas.width * aspectRatio;
-        };
+    const resizeCanvas = () => {
+        const aspectRatio = 1;
+        canvas.width = window.innerWidth < 500 ? window.innerWidth * 0.9 : 500;
+        canvas.height = canvas.width * aspectRatio;
+    };
 
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        // Use passive: false to allow preventDefault on touchmove events
-        window.addEventListener('touchmove', preventScroll, { passive: false });
-        window.addEventListener('wheel', preventScroll, { passive: false });
+    // Non-passive event listeners directly on the canvas
+    const preventScroll = (e) => {
+        if (isDrawing) {
+            e.preventDefault();
+        }
+    };
 
-        return () => {
-            window.removeEventListener('resize', resizeCanvas);
-            window.removeEventListener('touchmove', preventScroll);
-            window.removeEventListener('wheel', preventScroll);
-        };
-    }, [isDrawing]);
+    // Add the touchmove event listener as non-passive
+    canvas.addEventListener('touchmove', preventScroll, { passive: false });
+    canvas.addEventListener('wheel', preventScroll, { passive: false });
+
+    return () => {
+        window.removeEventListener('resize', resizeCanvas);
+        canvas.removeEventListener('touchmove', preventScroll);
+        canvas.removeEventListener('wheel', preventScroll);
+    };
+}, [isDrawing]);
+
 
     return (
         <div className="drawing-container">
