@@ -1,5 +1,6 @@
 import React from 'react';
 import './BlogPage.css'; // Ensure you have appropriate styles for the PDF container
+import bookimage from './08_youresosweet'; // Adjust the path as needed
 
 const BlogPage = () => {
 
@@ -36,6 +37,8 @@ const BlogPage = () => {
                 <p>
                     {/* Artwork content */}
                 </p>
+                {/* Embedded Image */}
+                <img src={bookimage} alt="Example Artwork" className="artwork-image" />
             </section>
 
             <section id="print">
