@@ -67,7 +67,7 @@ const ProductGrid = () => {
     });
 
     if (loading && page === 1) {
-        return <h2>Loading products...</h2>;
+        return <h2>Loading...</h2>;
     }
 
     if (error) {
