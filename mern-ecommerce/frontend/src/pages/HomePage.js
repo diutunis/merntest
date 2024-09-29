@@ -132,10 +132,8 @@ const HomePage = () => {
 
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
-        // Clear the current context and redraw the current drawings
         context.setTransform(newZoom, 0, 0, newZoom, pan.x, pan.y);
         setZoom(newZoom);
-        redrawCanvas(); // Redraw the current drawings with new zoom
     };
 
     const handlePan = (direction) => {
@@ -161,19 +159,6 @@ const HomePage = () => {
 
         context.setTransform(zoom, 0, 0, zoom, newPan.x, newPan.y);
         setPan(newPan);
-        redrawCanvas(); // Redraw the current drawings with new pan
-    };
-
-    const redrawCanvas = () => {
-        clearCanvas();
-        // Redraw the current drawings on the canvas according to the current transformations
-        drawings.forEach((drawing) => {
-            const img = new Image();
-            img.src = drawing.drawing; // Use the drawing's data
-            img.onload = () => {
-                context.drawImage(img, 0, 0);
-            };
-        });
     };
 
     return (
