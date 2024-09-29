@@ -7,44 +7,30 @@ const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
-    const [page, setPage] = useState(1); // Track current page
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true); // To know when to stop fetching more drawings
-    const pageSize = 30; // Define how many drawings to load per page
+    const [hasMore, setHasMore] = useState(true);
+    const pageSize = 30;
 
-    const [zoom, setZoom] = useState(1); // Zoom level
-    const [pan, setPan] = useState({ x: 0, y: 0 }); // Pan position
+    const [zoom, setZoom] = useState(1);
+    const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
 
-    // Initialize the canvas context
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
-
-        // Set the initial transformation for zoom and pan
         ctx.setTransform(1, 0, 0, 1, 0, 0);
     }, []);
 
-    // Fetch drawings
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
-
         setLoading(true);
         try {
             const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize}`);
             const data = await response.json();
 
-            let newDrawings = [];
-            if (Array.isArray(data)) {
-                newDrawings = data;
-            } else if (typeof data === 'object' && data.drawings) {
-                newDrawings = data.drawings;
-            } else {
-                console.error("Unexpected data format:", data);
-                return;
-            }
-
+            let newDrawings = Array.isArray(data) ? data : data.drawings || [];
             setDrawings((prevDrawings) => [...prevDrawings, ...newDrawings]);
 
             if (newDrawings.length < pageSize) {
@@ -71,15 +57,11 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
-    // Canvas drawing functionality
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
-        if (nativeEvent.touches && nativeEvent.touches.length > 0) {
-            const touch = nativeEvent.touches[0];
-            return { x: (touch.clientX - rect.left - pan.x) / zoom, y: (touch.clientY - rect.top - pan.y) / zoom };
-        } else {
-            return { x: (nativeEvent.clientX - rect.left - pan.x) / zoom, y: (nativeEvent.clientY - rect.top - pan.y) / zoom };
-        }
+        const x = (nativeEvent.clientX - rect.left - pan.x) / zoom;
+        const y = (nativeEvent.clientY - rect.top - pan.y) / zoom;
+        return { x, y };
     };
 
     const startDrawing = (nativeEvent) => {
@@ -111,15 +93,11 @@ const HomePage = () => {
 
     const saveDrawing = async () => {
         const drawing = canvasRef.current.toDataURL('image/png');
-        
         const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ drawing }),
         });
-        
         const savedDrawing = await response.json();
         setDrawings((prevDrawings) => [savedDrawing, ...prevDrawings]);
         clearCanvas();
@@ -137,7 +115,6 @@ const HomePage = () => {
         );
     };
 
-    // Prevent scrolling while drawing
     const preventScroll = (e) => {
         if (isDrawing) {
             e.preventDefault();
@@ -147,26 +124,23 @@ const HomePage = () => {
     useEffect(() => {
         window.addEventListener('touchmove', preventScroll, { passive: false });
         window.addEventListener('wheel', preventScroll, { passive: false });
-
         return () => {
             window.removeEventListener('touchmove', preventScroll);
             window.removeEventListener('wheel', preventScroll);
         };
     }, [isDrawing]);
 
-    // Handle zoom by scaling the drawing context
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
-
-        // Clear the current transformations
-        context.setTransform(newZoom, 0, 0, newZoom, pan.x, pan.y); // Apply zoom and pan
+        // Clear the current context and redraw the current drawings
+        context.setTransform(newZoom, 0, 0, newZoom, pan.x, pan.y);
         setZoom(newZoom);
+        redrawCanvas(); // Redraw the current drawings with new zoom
     };
 
-    // Handle pan by translating the drawing context
     const handlePan = (direction) => {
-        const panStep = 10; // Pixels to move per step
-        let newPan = { ...pan };
+        const panStep = 10;
+        const newPan = { ...pan };
 
         switch (direction) {
             case 'up':
@@ -185,9 +159,21 @@ const HomePage = () => {
                 break;
         }
 
-        // Apply zoom and pan
         context.setTransform(zoom, 0, 0, zoom, newPan.x, newPan.y);
         setPan(newPan);
+        redrawCanvas(); // Redraw the current drawings with new pan
+    };
+
+    const redrawCanvas = () => {
+        clearCanvas();
+        // Redraw the current drawings on the canvas according to the current transformations
+        drawings.forEach((drawing) => {
+            const img = new Image();
+            img.src = drawing.drawing; // Use the drawing's data
+            img.onload = () => {
+                context.drawImage(img, 0, 0);
+            };
+        });
     };
 
     return (
@@ -235,13 +221,14 @@ const HomePage = () => {
                     <div key={drawing._id} className="drawing-item">
                         <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
-                            <button onClick={() => handleLike(drawing._id)}><FontAwesomeIcon icon={faHandSparkles} /></button>
+                            <button onClick={() => handleLike(drawing._id)}>
+                                <FontAwesomeIcon icon={faHandSparkles} />
+                            </button>
                             <span>{drawing.likes || 0}</span>
                         </div>
                     </div>
                 ))}
             </div>
-
 
             {loading && <h4>Loading...</h4>}
         </div>
