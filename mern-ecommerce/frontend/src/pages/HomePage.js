@@ -14,6 +14,13 @@ const HomePage = () => {
 
     const [zoom, setZoom] = useState(1); // State for zoom level
     const [pan, setPan] = useState({ x: 0, y: 0 }); // State for panning
+    const [context, setContext] = useState(null); // Canvas context for panning and zooming
+
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        setContext(ctx);
+    }, []);
 
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
@@ -74,7 +81,6 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
-        const context = canvasRef.current.getContext('2d');
         context.beginPath();
         context.moveTo(x, y);
     };
@@ -83,7 +89,6 @@ const HomePage = () => {
         if (!isDrawing) return;
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
-        const context = canvasRef.current.getContext('2d');
         context.lineTo(x, y);
         context.stroke();
     };
@@ -92,12 +97,10 @@ const HomePage = () => {
         if (!isDrawing) return;
         nativeEvent.preventDefault();
         setIsDrawing(false);
-        const context = canvasRef.current.getContext('2d');
         context.closePath();
     };
 
     const clearCanvas = () => {
-        const context = canvasRef.current.getContext('2d');
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     };
 
@@ -146,28 +149,37 @@ const HomePage = () => {
         };
     }, [isDrawing]);
 
-    // Handle zoom
+    // Handle zoom by scaling the drawing context
     const handleZoomChange = (e) => {
-        setZoom(e.target.value);
+        const newZoom = parseFloat(e.target.value);
+        context.setTransform(newZoom, 0, 0, newZoom, pan.x, pan.y); // Adjust scale and pan in context
+        setZoom(newZoom);
     };
 
-    // Handle pan (joystick simulation)
+    // Handle pan by translating the drawing context
     const handlePan = (direction) => {
         const panStep = 10; // Amount of pixels to move
-        setPan((prevPan) => {
-            switch (direction) {
-                case 'up':
-                    return { ...prevPan, y: prevPan.y - panStep };
-                case 'down':
-                    return { ...prevPan, y: prevPan.y + panStep };
-                case 'left':
-                    return { ...prevPan, x: prevPan.x - panStep };
-                case 'right':
-                    return { ...prevPan, x: prevPan.x + panStep };
-                default:
-                    return prevPan;
-            }
-        });
+        let newPan = { ...pan };
+
+        switch (direction) {
+            case 'up':
+                newPan.y -= panStep;
+                break;
+            case 'down':
+                newPan.y += panStep;
+                break;
+            case 'left':
+                newPan.x -= panStep;
+                break;
+            case 'right':
+                newPan.x += panStep;
+                break;
+            default:
+                break;
+        }
+
+        context.setTransform(zoom, 0, 0, zoom, newPan.x, newPan.y); // Adjust transform
+        setPan(newPan);
     };
 
     return (
@@ -184,7 +196,6 @@ const HomePage = () => {
                 className="drawing-canvas"
                 width={500}
                 height={500}
-                style={{ transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)` }}
             />
             <div className="controls">
                 <label htmlFor="zoom">Zoom: {zoom}</label>
