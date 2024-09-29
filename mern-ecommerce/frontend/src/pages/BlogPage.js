@@ -1,6 +1,6 @@
 import React from 'react';
 import './BlogPage.css'; // Ensure you have appropriate styles for the PDF container
-import bookimage from './08_youresosweet'; // Adjust the path as needed
+import bookimage from './book'; // Adjust the path as needed
 
 const BlogPage = () => {
 
