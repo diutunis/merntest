@@ -7,14 +7,15 @@ const HomePage = () => {
     const canvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
-    const [page, setPage] = useState(1); // Track current page
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [hasMore, setHasMore] = useState(true); // To know when to stop fetching more drawings
-    const pageSize = 30; // Define how many drawings to load per page
+    const [hasMore, setHasMore] = useState(true);
+    const pageSize = 30;
 
-    const [zoom, setZoom] = useState(1); // State for zoom level
-    const [pan, setPan] = useState({ x: 0, y: 0 }); // State for panning
-    const [context, setContext] = useState(null); // Canvas context for panning and zooming
+    const [zoom, setZoom] = useState(1);
+    const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [context, setContext] = useState(null);
+    const [lines, setLines] = useState([]); // Store drawn lines
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -57,7 +58,7 @@ const HomePage = () => {
 
     const handleScroll = () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
-            setPage((prevPage) => prevPage + 1); // Increment the page number
+            setPage((prevPage) => prevPage + 1);
         }
     };
 
@@ -66,7 +67,7 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
-    // Canvas drawing functionality
+    // Get mouse/touch position
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         if (nativeEvent.touches && nativeEvent.touches.length > 0) {
@@ -77,31 +78,35 @@ const HomePage = () => {
         }
     };
 
+    // Start drawing
     const startDrawing = (nativeEvent) => {
         nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
-        context.beginPath();
-        context.moveTo(x, y);
+        setLines((prevLines) => [...prevLines, [{ x, y }]]);
     };
 
+    // Draw on canvas
     const draw = (nativeEvent) => {
         if (!isDrawing) return;
         nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
-        context.lineTo(x, y);
-        context.stroke();
+        setLines((prevLines) => {
+            const newLines = [...prevLines];
+            const lastLine = newLines[newLines.length - 1];
+            lastLine.push({ x, y });
+            return newLines;
+        });
     };
 
-    const stopDrawing = (nativeEvent) => {
-        if (!isDrawing) return;
-        nativeEvent.preventDefault();
+    const stopDrawing = () => {
         setIsDrawing(false);
-        context.closePath();
     };
 
+    // Clear canvas
     const clearCanvas = () => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        setLines([]);
     };
 
     const saveDrawing = async () => {
@@ -132,7 +137,7 @@ const HomePage = () => {
         );
     };
 
-    // Disable scroll while drawing
+    // Prevent page scroll while drawing
     const preventScroll = (e) => {
         if (isDrawing) {
             e.preventDefault();
@@ -149,16 +154,16 @@ const HomePage = () => {
         };
     }, [isDrawing]);
 
-    // Handle zoom by scaling the drawing context
+    // Handle zoom change
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
-        context.setTransform(newZoom, 0, 0, newZoom, pan.x, pan.y); // Adjust scale and pan in context
         setZoom(newZoom);
+        redrawCanvas(newZoom, pan);
     };
 
-    // Handle pan by translating the drawing context
+    // Handle pan
     const handlePan = (direction) => {
-        const panStep = 10; // Amount of pixels to move
+        const panStep = 10;
         let newPan = { ...pan };
 
         switch (direction) {
@@ -178,8 +183,27 @@ const HomePage = () => {
                 break;
         }
 
-        context.setTransform(zoom, 0, 0, zoom, newPan.x, newPan.y); // Adjust transform
         setPan(newPan);
+        redrawCanvas(zoom, newPan);
+    };
+
+    // Redraw the entire canvas when zooming or panning
+    const redrawCanvas = (newZoom, newPan) => {
+        context.save();
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
+
+        // Redraw all the lines
+        lines.forEach(line => {
+            context.beginPath();
+            context.moveTo(line[0].x, line[0].y);
+            for (let i = 1; i < line.length; i++) {
+                context.lineTo(line[i].x, line[i].y);
+            }
+            context.stroke();
+        });
+
+        context.restore();
     };
 
     return (
