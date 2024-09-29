@@ -32,8 +32,9 @@ const BlogPage = () => {
                 <h2>Good is he who gives and receives naught.</h2>
             </section>
 
-           
+           </>
             </div>
+</>
         </>
     );
 };
