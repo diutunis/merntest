@@ -12,7 +12,9 @@ const HomePage = () => {
     const [hasMore, setHasMore] = useState(true); // To know when to stop fetching more drawings
     const pageSize = 30; // Define how many drawings to load per page
 
-    // Function to fetch drawings with pagination
+    const [zoom, setZoom] = useState(1); // State for zoom level
+    const [pan, setPan] = useState({ x: 0, y: 0 }); // State for panning
+
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
 
@@ -31,10 +33,8 @@ const HomePage = () => {
                 return;
             }
 
-            // Add new drawings to the existing ones
             setDrawings((prevDrawings) => [...prevDrawings, ...newDrawings]);
 
-            // If fewer drawings than expected were returned, stop fetching more
             if (newDrawings.length < pageSize) {
                 setHasMore(false);
             }
@@ -46,9 +46,8 @@ const HomePage = () => {
 
     useEffect(() => {
         fetchDrawings();
-    }, [page]); // Fetch drawings every time the page number increments
+    }, [page]);
 
-    // Load more drawings when scrolling reaches the bottom
     const handleScroll = () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
             setPage((prevPage) => prevPage + 1); // Increment the page number
@@ -64,17 +63,15 @@ const HomePage = () => {
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         if (nativeEvent.touches && nativeEvent.touches.length > 0) {
-            // Get touch position for touch input
             const touch = nativeEvent.touches[0];
-            return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+            return { x: (touch.clientX - rect.left - pan.x) / zoom, y: (touch.clientY - rect.top - pan.y) / zoom };
         } else {
-            // Get mouse position for mouse input
-            return { x: nativeEvent.clientX - rect.left, y: nativeEvent.clientY - rect.top };
+            return { x: (nativeEvent.clientX - rect.left - pan.x) / zoom, y: (nativeEvent.clientY - rect.top - pan.y) / zoom };
         }
     };
 
     const startDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault(); // Prevent any default actions
+        nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
@@ -84,7 +81,7 @@ const HomePage = () => {
 
     const draw = (nativeEvent) => {
         if (!isDrawing) return;
-        nativeEvent.preventDefault(); // Prevent scrolling and other default actions
+        nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         const context = canvasRef.current.getContext('2d');
         context.lineTo(x, y);
@@ -140,7 +137,6 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-        // Prevent scroll on touchmove and mousewheel events when drawing
         window.addEventListener('touchmove', preventScroll, { passive: false });
         window.addEventListener('wheel', preventScroll, { passive: false });
 
@@ -150,6 +146,30 @@ const HomePage = () => {
         };
     }, [isDrawing]);
 
+    // Handle zoom
+    const handleZoomChange = (e) => {
+        setZoom(e.target.value);
+    };
+
+    // Handle pan (joystick simulation)
+    const handlePan = (direction) => {
+        const panStep = 10; // Amount of pixels to move
+        setPan((prevPan) => {
+            switch (direction) {
+                case 'up':
+                    return { ...prevPan, y: prevPan.y - panStep };
+                case 'down':
+                    return { ...prevPan, y: prevPan.y + panStep };
+                case 'left':
+                    return { ...prevPan, x: prevPan.x - panStep };
+                case 'right':
+                    return { ...prevPan, x: prevPan.x + panStep };
+                default:
+                    return prevPan;
+            }
+        });
+    };
+
     return (
         <div className="drawing-container">
             <canvas
@@ -157,14 +177,37 @@ const HomePage = () => {
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing} // Stop drawing if the mouse leaves the canvas
+                onMouseLeave={stopDrawing}
                 onTouchStart={startDrawing}
                 onTouchMove={draw}
                 onTouchEnd={stopDrawing}
                 className="drawing-canvas"
-                width={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
-                height={window.innerWidth < 500 ? window.innerWidth * 0.9 : 500}
+                width={500}
+                height={500}
+                style={{ transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)` }}
             />
+            <div className="controls">
+                <label htmlFor="zoom">Zoom: {zoom}</label>
+                <input
+                    type="range"
+                    id="zoom"
+                    min="0.5"
+                    max="3"
+                    step="0.1"
+                    value={zoom}
+                    onChange={handleZoomChange}
+                />
+
+                <div className="joystick">
+                    <button onClick={() => handlePan('up')}>↑</button>
+                    <div>
+                        <button onClick={() => handlePan('left')}>←</button>
+                        <button onClick={() => handlePan('right')}>→</button>
+                    </div>
+                    <button onClick={() => handlePan('down')}>↓</button>
+                </div>
+            </div>
+
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
 
