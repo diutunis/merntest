@@ -7,10 +7,7 @@ const BlogPage = () => {
     return (
         <>
             <section className="container" id="about">
-           
-     
                 <h2>You're so sweet, your cigarette smoke tastes like honey</h2>
-             
                 <div className="container">
                     <div className="ticker-container">
                         <div className="ticker-tape">
@@ -31,12 +28,11 @@ const BlogPage = () => {
             <section id="print">
                 <h2>Good is he who gives and receives naught.</h2>
             </section>
-
-           </>
-            </div>
-</>
         </>
     );
 };
+
+export default BlogPage;
+
 
 export default BlogPage;
