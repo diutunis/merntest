@@ -180,6 +180,7 @@ const HomePage = () => {
         const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
         const angle = Math.atan2(joystickY, joystickX);
 
+        // Limit joystick movement within the joystickRadius
         if (distance > joystickRadius) {
             joystickX = joystickRadius * Math.cos(angle);
             joystickY = joystickRadius * Math.sin(angle);
@@ -192,7 +193,7 @@ const HomePage = () => {
             x: prevPan.x - joystickX / 10,
             y: prevPan.y - joystickY / 10,
         }));
-
+        
         // Apply transformation
         applyTransformation(zoom, {
             x: pan.x - joystickX / 10,
@@ -201,7 +202,10 @@ const HomePage = () => {
     };
 
     const stopJoystick = () => {
-        setJoystickPosition({ x: 0, y: 0 }); // Reset to center
+        // Reset joystick position to the center
+        setJoystickPosition({ x: 0, y: 0 });
+        // Optionally reset pan if desired
+        // setPan({ x: 0, y: 0 }); 
     };
 
     return (
@@ -251,7 +255,7 @@ const HomePage = () => {
                             height: '30px',
                             borderRadius: '50%',
                             backgroundColor: 'blue',
-                            transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)`,
+                            transform: `translate(${joystickPosition.x + 35}px, ${joystickPosition.y + 35}px)`,
                             transition: 'transform 0.1s',
                         }}
                     />
