@@ -21,6 +21,7 @@ const HomePage = () => {
     // Joystick state
     const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
     const joystickRadius = 50; // Radius of the joystick circle
+    const [isJoystickActive, setIsJoystickActive] = useState(false); // Track joystick usage
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -137,7 +138,7 @@ const HomePage = () => {
     };
 
     const preventScroll = (e) => {
-        if (isDrawing) {
+        if (isDrawing || isJoystickActive) {
             e.preventDefault();
         }
     };
@@ -149,7 +150,7 @@ const HomePage = () => {
             window.removeEventListener('touchmove', preventScroll);
             window.removeEventListener('wheel', preventScroll);
         };
-    }, [isDrawing]);
+    }, [isDrawing, isJoystickActive]);
 
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
@@ -201,11 +202,16 @@ const HomePage = () => {
         });
     };
 
+    const startJoystick = () => {
+        setIsJoystickActive(true); // Mark joystick as active
+    };
+
     const stopJoystick = () => {
         // Reset joystick position to the center
         setJoystickPosition({ x: 0, y: 0 });
         // Optionally reset pan if desired
         // setPan({ x: 0, y: 0 }); 
+        setIsJoystickActive(false); // Mark joystick as inactive
     };
 
     return (
@@ -240,15 +246,16 @@ const HomePage = () => {
                         width: '100px',
                         height: '100px',
                         borderRadius: '50%',
-                        border: '2px solid black',
+                        backgroundColor: 'lightgray',
                         overflow: 'hidden',
                     }}
-                    onPointerDown={handleJoystickMove}
-                    onPointerMove={handleJoystickMove}
-                    onPointerUp={stopJoystick}
-                    onPointerLeave={stopJoystick}
+                    onMouseDown={startJoystick}
+                    onMouseMove={handleJoystickMove}
+                    onMouseUp={stopJoystick}
+                    onMouseLeave={stopJoystick}
                 >
                     <div
+                        className="joystick-handle"
                         style={{
                             position: 'absolute',
                             width: '30px',
