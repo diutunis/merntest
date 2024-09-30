@@ -15,7 +15,7 @@ const HomePage = () => {
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
-    const [savedCanvasImage, setSavedCanvasImage] = useState(null);
+    const [paths, setPaths] = useState([]);  // To store drawn paths
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -86,11 +86,15 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-        saveCanvasState(); // Save the canvas state after drawing stops
+
+        // Save current drawing path to the paths array
+        const currentPath = context.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
+        setPaths((prevPaths) => [...prevPaths, currentPath]);
     };
 
     const clearCanvas = () => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        setPaths([]);  // Clear saved paths
     };
 
     const saveDrawing = async () => {
@@ -134,9 +138,8 @@ const HomePage = () => {
 
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
-        setZoom(newZoom);
-        saveCanvasState();  // Save current drawing before applying zoom
         applyTransformation(newZoom, pan);
+        setZoom(newZoom);
     };
 
     const handlePan = (direction) => {
@@ -160,34 +163,24 @@ const HomePage = () => {
                 break;
         }
 
-        setPan(newPan);
-        saveCanvasState();  // Save current drawing before applying pan
         applyTransformation(zoom, newPan);
+        setPan(newPan);
     };
 
     const applyTransformation = (newZoom, newPan) => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
-        context.lineWidth = 1 / newZoom; // Scale the line width inversely to the zoom level
+        context.lineWidth = 1 / newZoom; // Adjust line width based on zoom
 
         redrawCanvas();
-    };
-
-    const saveCanvasState = () => {
-        const canvas = canvasRef.current;
-        setSavedCanvasImage(canvas.toDataURL());  // Save current drawing content
     };
 
     const redrawCanvas = () => {
         clearCanvas();
 
-        // Redraw saved image (only the current canvas content)
-        if (savedCanvasImage) {
-            const img = new Image();
-            img.src = savedCanvasImage;
-            img.onload = () => {
-                context.drawImage(img, 0, 0);
-            };
-        }
+        // Redraw the stored paths
+        paths.forEach((path) => {
+            context.putImageData(path, 0, 0);
+        });
     };
 
     return (
@@ -249,4 +242,4 @@ const HomePage = () => {
     );
 };
 
-export default HomePage;
+export default HomePage
