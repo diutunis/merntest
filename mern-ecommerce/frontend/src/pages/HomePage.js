@@ -5,7 +5,7 @@ import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
-    const offscreenCanvasRef = useRef(null);
+    const offscreenCanvasRef = useRef(null); // Offscreen canvas to store drawings
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
     const [page, setPage] = useState(1);
@@ -102,20 +102,7 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-        offscreenContext.closePath();
-    };
-
-    const handleTouchStart = (e) => {
-        // Prevent default to avoid scrolling
-        e.preventDefault();
-        const touch = e.touches[0]; // Get the first touch point
-        startDrawing(touch);
-    };
-
-    const handleTouchMove = (e) => {
-        e.preventDefault(); // Prevent scrolling
-        const touch = e.touches[0]; // Get the first touch point
-        draw(touch);
+        offscreenContext.closePath(); // Close the path on the offscreen canvas
     };
 
     const clearCanvas = () => {
@@ -213,13 +200,10 @@ const HomePage = () => {
         <div className="drawing-container">
             <canvas
                 ref={canvasRef}
-                onMouseDown={startDrawing}
-                onMouseMove={draw}
-                onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={stopDrawing}
+                onPointerDown={startDrawing}
+                onPointerMove={draw}
+                onPointerUp={stopDrawing}
+                onPointerLeave={stopDrawing}
                 className="drawing-canvas"
                 width={500}
                 height={500}
