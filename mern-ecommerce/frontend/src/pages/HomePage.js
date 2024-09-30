@@ -15,12 +15,14 @@ const HomePage = () => {
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
+    const [initialLineWidth, setInitialLineWidth] = useState(1);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        setInitialLineWidth(ctx.lineWidth); // Save the initial line width for scaling later
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Set initial transformation
     }, []);
 
     const fetchDrawings = async () => {
@@ -132,8 +134,8 @@ const HomePage = () => {
 
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
-        context.setTransform(newZoom, 0, 0, newZoom, pan.x, pan.y);
         setZoom(newZoom);
+        applyTransformation(newZoom, pan);
     };
 
     const handlePan = (direction) => {
@@ -157,8 +159,28 @@ const HomePage = () => {
                 break;
         }
 
-        context.setTransform(zoom, 0, 0, zoom, newPan.x, newPan.y);
         setPan(newPan);
+        applyTransformation(zoom, newPan);
+    };
+
+    const applyTransformation = (newZoom, newPan) => {
+        context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
+        context.lineWidth = initialLineWidth / newZoom; // Scale the line width inversely to the zoom level
+
+        // Redraw all drawings on the canvas to apply transformations
+        redrawCanvas();
+    };
+
+    const redrawCanvas = () => {
+        clearCanvas();
+        // Redraw all saved drawings after transformation
+        drawings.forEach((drawing) => {
+            const img = new Image();
+            img.src = drawing.drawing; // Use the drawing's data
+            img.onload = () => {
+                context.drawImage(img, 0, 0);
+            };
+        });
     };
 
     return (
