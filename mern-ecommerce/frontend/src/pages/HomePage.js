@@ -155,34 +155,9 @@ const HomePage = () => {
         setZoom(newZoom);
     };
 
-    const handlePan = (direction) => {
-        const panStep = 10;
-        const newPan = { ...pan };
-
-        switch (direction) {
-            case 'up':
-                newPan.y -= panStep;
-                break;
-            case 'down':
-                newPan.y += panStep;
-                break;
-            case 'left':
-                newPan.x -= panStep;
-                break;
-            case 'right':
-                newPan.x += panStep;
-                break;
-            default:
-                break;
-        }
-
-        applyTransformation(zoom, newPan);
-        setPan(newPan);
-    };
-
     const applyTransformation = (newZoom, newPan) => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
-        context.lineWidth = 1 / newZoom; 
+        context.lineWidth = 1 / newZoom;
 
         redrawCanvas();
     };
@@ -204,27 +179,24 @@ const HomePage = () => {
         const dx = event.clientX - centerX;
         const dy = event.clientY - centerY;
 
-        const distance = Math.sqrt(dx * dx + dy * dy);
         const maxDistance = rect.width / 2;
 
-        // Move the joystick handle
-        if (distance > maxDistance) {
-            const angle = Math.atan2(dy, dx);
-            const adjustedX = Math.cos(angle) * maxDistance;
-            const adjustedY = Math.sin(angle) * maxDistance;
+        // Normalize the joystick handle's position
+        const distance = Math.min(Math.sqrt(dx * dx + dy * dy), maxDistance);
+        const angle = Math.atan2(dy, dx);
 
-            setJoystickPos({ x: adjustedX, y: adjustedY });
-            setPan((prev) => ({
-                x: prev.x - adjustedX / zoom,
-                y: prev.y - adjustedY / zoom,
-            }));
-        } else {
-            setJoystickPos({ x: dx, y: dy });
-            setPan((prev) => ({
-                x: prev.x - dx / zoom,
-                y: prev.y - dy / zoom,
-            }));
-        }
+        // Update joystick position
+        setJoystickPos({
+            x: Math.cos(angle) * distance,
+            y: Math.sin(angle) * distance,
+        });
+
+        // Update pan position
+        const panStep = 10;
+        setPan((prev) => ({
+            x: prev.x - (Math.cos(angle) * panStep * (distance / maxDistance)),
+            y: prev.y - (Math.sin(angle) * panStep * (distance / maxDistance)),
+        }));
 
         redrawCanvas();
     };
@@ -234,6 +206,8 @@ const HomePage = () => {
         setJoystickPos({ x: 0, y: 0 }); // Reset joystick position
         document.removeEventListener('mousemove', handleJoystickMove);
         document.removeEventListener('mouseup', handleJoystickUp);
+        document.removeEventListener('touchmove', handleJoystickMove);
+        document.removeEventListener('touchend', handleJoystickUp);
     };
 
     const handleJoystickDown = (event) => {
@@ -241,6 +215,8 @@ const HomePage = () => {
         setIsJoystickActive(true);
         document.addEventListener('mousemove', handleJoystickMove);
         document.addEventListener('mouseup', handleJoystickUp);
+        document.addEventListener('touchmove', handleJoystickMove);
+        document.addEventListener('touchend', handleJoystickUp);
     };
 
     return (
@@ -269,11 +245,10 @@ const HomePage = () => {
                     value={zoom}
                     onChange={handleZoomChange}
                 />
-
                 <div
-                    className="joystick"
                     id="joystick"
                     onMouseDown={handleJoystickDown}
+                    onTouchStart={handleJoystickDown}
                     style={{
                         position: 'relative',
                         width: '100px',
