@@ -135,7 +135,7 @@ const HomePage = () => {
     };
 
     const preventScroll = (e) => {
-        if (isDrawing) {
+        if (isDrawing || isJoystickActive) {
             e.preventDefault();
         }
     };
@@ -147,7 +147,7 @@ const HomePage = () => {
             window.removeEventListener('touchmove', preventScroll);
             window.removeEventListener('wheel', preventScroll);
         };
-    }, [isDrawing]);
+    }, [isDrawing, isJoystickActive]);
 
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
@@ -219,6 +219,20 @@ const HomePage = () => {
         document.addEventListener('touchend', handleJoystickUp);
     };
 
+    const handleCanvasTouchStart = (e) => {
+        const touch = e.touches[0];
+        startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
+    };
+
+    const handleCanvasTouchMove = (e) => {
+        const touch = e.touches[0];
+        draw({ clientX: touch.clientX, clientY: touch.clientY });
+    };
+
+    const handleCanvasTouchEnd = (e) => {
+        stopDrawing(e);
+    };
+
     return (
         <div className="drawing-container">
             <canvas
@@ -226,51 +240,46 @@ const HomePage = () => {
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
-                onTouchStart={startDrawing}
-                onTouchMove={draw}
-                onTouchEnd={stopDrawing}
-                className="drawing-canvas"
-                width={500}
-                height={500}
+                onTouchStart={handleCanvasTouchStart}
+                onTouchMove={handleCanvasTouchMove}
+                onTouchEnd={handleCanvasTouchEnd}
+                width={800}
+                height={600}
+                style={{ border: '1px solid black', touchAction: 'none' }} // Prevent scrolling
             />
-            <div className="controls">
-                <label htmlFor="zoom">Zoom: {zoom}</label>
-                <input
-                    type="range"
-                    id="zoom"
-                    min="0.5"
-                    max="3"
-                    step="0.1"
-                    value={zoom}
-                    onChange={handleZoomChange}
-                />
+            <input
+                type="range"
+                min="0.5"
+                max="5"
+                step="0.1"
+                value={zoom}
+                onChange={handleZoomChange}
+            />
+            <div
+                id="joystick"
+                onMouseDown={handleJoystickDown}
+                onTouchStart={handleJoystickDown}
+                style={{
+                    position: 'relative',
+                    width: '100px',
+                    height: '100px',
+                    backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                    borderRadius: '50%',
+                    overflow: 'hidden',
+                }}
+            >
                 <div
-                    id="joystick"
-                    onMouseDown={handleJoystickDown}
-                    onTouchStart={handleJoystickDown}
+                    className="joystick-handle"
                     style={{
-                        position: 'relative',
-                        width: '100px',
-                        height: '100px',
-                        backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                        position: 'absolute',
+                        width: '40px',
+                        height: '40px',
+                        backgroundColor: 'blue',
                         borderRadius: '50%',
-                        overflow: 'hidden',
+                        transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
+                        transition: 'transform 0.1s',
                     }}
-                >
-                    <div
-                        className="joystick-handle"
-                        style={{
-                            position: 'absolute',
-                            width: '40px',
-                            height: '40px',
-                            backgroundColor: 'blue',
-                            borderRadius: '50%',
-                            transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
-                            transition: 'transform 0.1s',
-                        }}
-                    />
-                </div>
+                />
             </div>
 
             <button onClick={saveDrawing}>Post</button>
