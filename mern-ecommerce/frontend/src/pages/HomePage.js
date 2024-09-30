@@ -219,14 +219,15 @@ const HomePage = () => {
         document.addEventListener('touchend', handleJoystickUp);
     };
 
+    // Touch event handlers for drawing
     const handleCanvasTouchStart = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent scrolling
         const touch = e.touches[0];
         startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
     };
 
     const handleCanvasTouchMove = (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Prevent scrolling
         const touch = e.touches[0];
         draw({ clientX: touch.clientX, clientY: touch.clientY });
     };
