@@ -220,16 +220,19 @@ const HomePage = () => {
     };
 
     const handleCanvasTouchStart = (e) => {
+        e.preventDefault();
         const touch = e.touches[0];
         startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
     };
 
     const handleCanvasTouchMove = (e) => {
+        e.preventDefault();
         const touch = e.touches[0];
         draw({ clientX: touch.clientX, clientY: touch.clientY });
     };
 
     const handleCanvasTouchEnd = (e) => {
+        e.preventDefault();
         stopDrawing(e);
     };
 
