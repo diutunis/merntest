@@ -5,7 +5,7 @@ import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
-    const offscreenCanvasRef = useRef(null); // Offscreen canvas to store drawings
+    const offscreenCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
     const [page, setPage] = useState(1);
@@ -75,8 +75,19 @@ const HomePage = () => {
         return { x, y };
     };
 
+    const handleTouchStart = (e) => {
+        e.preventDefault();
+        const touch = e.touches[0]; // Get the first touch point
+        startDrawing(touch);
+    };
+
+    const handleTouchMove = (e) => {
+        e.preventDefault();
+        const touch = e.touches[0]; // Get the first touch point
+        draw(touch);
+    };
+
     const startDrawing = (nativeEvent) => {
-        nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
         context.beginPath();
@@ -87,7 +98,6 @@ const HomePage = () => {
 
     const draw = (nativeEvent) => {
         if (!isDrawing) return;
-        nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         context.lineTo(x, y);
         context.stroke();
@@ -99,10 +109,9 @@ const HomePage = () => {
 
     const stopDrawing = (nativeEvent) => {
         if (!isDrawing) return;
-        nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-        offscreenContext.closePath(); // Close the path on the offscreen canvas
+        offscreenContext.closePath();
     };
 
     const clearCanvas = () => {
@@ -204,8 +213,8 @@ const HomePage = () => {
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
                 onMouseLeave={stopDrawing}
-                onTouchStart={startDrawing}
-                onTouchMove={draw}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
                 onTouchEnd={stopDrawing}
                 className="drawing-canvas"
                 width={500}
