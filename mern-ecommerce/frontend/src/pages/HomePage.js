@@ -143,6 +143,12 @@ const HomePage = () => {
         }
     };
 
+    const handleMouseMove = (nativeEvent) => {
+        if (isJoystickActive) {
+            handleJoystickMove(nativeEvent);
+        }
+    };
+
     useEffect(() => {
         window.addEventListener('touchmove', preventScroll, { passive: false });
         window.addEventListener('wheel', preventScroll, { passive: false });
@@ -243,14 +249,14 @@ const HomePage = () => {
                     className="joystick"
                     style={{
                         position: 'relative',
-                        width: '100px',
-                        height: '100px',
+                        width: `${joystickRadius * 2}px`,
+                        height: `${joystickRadius * 2}px`,
                         borderRadius: '50%',
                         backgroundColor: 'lightgray',
                         overflow: 'hidden',
                     }}
                     onMouseDown={startJoystick}
-                    onMouseMove={handleJoystickMove}
+                    onMouseMove={handleMouseMove}
                     onMouseUp={stopJoystick}
                     onMouseLeave={stopJoystick}
                 >
