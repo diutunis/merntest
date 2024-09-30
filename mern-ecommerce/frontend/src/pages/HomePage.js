@@ -34,8 +34,6 @@ const HomePage = () => {
         const offscreenCtx = offscreenCanvas.getContext('2d');
         offscreenCanvasRef.current = offscreenCanvas;
         setOffscreenContext(offscreenCtx);
-
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
     }, []);
 
     const fetchDrawings = async () => {
@@ -255,10 +253,10 @@ const HomePage = () => {
                         backgroundColor: 'lightgray',
                         overflow: 'hidden',
                     }}
-                    onMouseDown={startJoystick}
-                    onMouseMove={handleMouseMove}
-                    onMouseUp={stopJoystick}
-                    onMouseLeave={stopJoystick}
+                    onPointerDown={startJoystick}
+                    onPointerMove={handleMouseMove}
+                    onPointerUp={stopJoystick}
+                    onPointerLeave={stopJoystick}
                 >
                     <div
                         className="joystick-handle"
@@ -268,7 +266,7 @@ const HomePage = () => {
                             height: '30px',
                             borderRadius: '50%',
                             backgroundColor: 'blue',
-                            transform: `translate(${joystickPosition.x + 35}px, ${joystickPosition.y + 35}px)`,
+                            transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
                             transition: 'transform 0.1s',
                         }}
                     />
