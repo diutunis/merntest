@@ -16,6 +16,7 @@ const HomePage = () => {
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
     const [initialLineWidth, setInitialLineWidth] = useState(1);
+    const [savedCanvasImage, setSavedCanvasImage] = useState(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -135,6 +136,7 @@ const HomePage = () => {
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
         setZoom(newZoom);
+        saveCanvasState();  // Save current drawing before applying zoom
         applyTransformation(newZoom, pan);
     };
 
@@ -160,6 +162,7 @@ const HomePage = () => {
         }
 
         setPan(newPan);
+        saveCanvasState();  // Save current drawing before applying pan
         applyTransformation(zoom, newPan);
     };
 
@@ -167,12 +170,26 @@ const HomePage = () => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
         context.lineWidth = initialLineWidth / newZoom; // Scale the line width inversely to the zoom level
 
-        // Redraw all drawings on the canvas to apply transformations
         redrawCanvas();
+    };
+
+    const saveCanvasState = () => {
+        const canvas = canvasRef.current;
+        setSavedCanvasImage(canvas.toDataURL());
     };
 
     const redrawCanvas = () => {
         clearCanvas();
+
+        // Redraw saved image if any
+        if (savedCanvasImage) {
+            const img = new Image();
+            img.src = savedCanvasImage;
+            img.onload = () => {
+                context.drawImage(img, 0, 0);
+            };
+        }
+
         // Redraw all saved drawings after transformation
         drawings.forEach((drawing) => {
             const img = new Image();
