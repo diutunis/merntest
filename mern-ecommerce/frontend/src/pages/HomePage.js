@@ -5,7 +5,7 @@ import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
-    const offscreenCanvasRef = useRef(null); // Offscreen canvas to store drawings
+    const offscreenCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
     const [page, setPage] = useState(1);
@@ -18,12 +18,15 @@ const HomePage = () => {
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
 
+    // Joystick state
+    const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
+    const joystickRadius = 50; // Radius of the joystick circle
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
 
-        // Setup offscreen canvas
         const offscreenCanvas = document.createElement('canvas');
         offscreenCanvas.width = canvas.width;
         offscreenCanvas.height = canvas.height;
@@ -31,7 +34,7 @@ const HomePage = () => {
         offscreenCanvasRef.current = offscreenCanvas;
         setOffscreenContext(offscreenCtx);
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // Set initial transformation
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
     }, []);
 
     const fetchDrawings = async () => {
@@ -92,7 +95,6 @@ const HomePage = () => {
         context.lineTo(x, y);
         context.stroke();
 
-        // Also draw on the offscreen canvas
         offscreenContext.lineTo(x, y);
         offscreenContext.stroke();
     };
@@ -102,7 +104,7 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-        offscreenContext.closePath(); // Close the path on the offscreen canvas
+        offscreenContext.closePath();
     };
 
     const clearCanvas = () => {
@@ -155,45 +157,45 @@ const HomePage = () => {
         setZoom(newZoom);
     };
 
-    const handlePan = (direction) => {
-        const panStep = 10;
-        const newPan = { ...pan };
-
-        switch (direction) {
-            case 'up':
-                newPan.y -= panStep;
-                break;
-            case 'down':
-                newPan.y += panStep;
-                break;
-            case 'left':
-                newPan.x -= panStep;
-                break;
-            case 'right':
-                newPan.x += panStep;
-                break;
-            default:
-                break;
-        }
-
-        applyTransformation(zoom, newPan);
-        setPan(newPan);
-    };
-
     const applyTransformation = (newZoom, newPan) => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
-        context.lineWidth = 1 / newZoom; // Adjust line width based on zoom
-
-        // Redraw the offscreen canvas content on the visible canvas
+        context.lineWidth = 1 / newZoom;
         redrawCanvas();
     };
 
     const redrawCanvas = () => {
-        // Clear the visible canvas
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-        // Redraw the offscreen canvas onto the visible canvas
         context.drawImage(offscreenCanvasRef.current, 0, 0);
+    };
+
+    // Handle joystick movement
+    const handleJoystickMove = (nativeEvent) => {
+        const rect = nativeEvent.currentTarget.getBoundingClientRect();
+        const joystickX = nativeEvent.clientX - rect.left - joystickRadius;
+        const joystickY = nativeEvent.clientY - rect.top - joystickRadius;
+
+        const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
+        const angle = Math.atan2(joystickY, joystickX);
+
+        if (distance > joystickRadius) {
+            joystickX = joystickRadius * Math.cos(angle);
+            joystickY = joystickRadius * Math.sin(angle);
+        }
+
+        setJoystickPosition({ x: joystickX, y: joystickY });
+
+        // Update pan based on joystick position
+        setPan((prevPan) => ({
+            x: prevPan.x - joystickX / 10,
+            y: prevPan.y - joystickY / 10,
+        }));
+
+        applyTransformation(zoom, { x: prevPan.x - joystickX / 10, y: prevPan.y - joystickY / 10 });
+    };
+
+    const stopJoystick = () => {
+        setJoystickPosition({ x: 0, y: 0 });
+        setPan({ x: 0, y: 0 }); // Reset pan or keep the current one
     };
 
     return (
@@ -220,13 +222,26 @@ const HomePage = () => {
                     onChange={handleZoomChange}
                 />
 
-                <div className="joystick">
-                    <button onClick={() => handlePan('up')}>↑</button>
-                    <div>
-                        <button onClick={() => handlePan('left')}>←</button>
-                        <button onClick={() => handlePan('right')}>→</button>
-                    </div>
-                    <button onClick={() => handlePan('down')}>↓</button>
+                {/* Joystick Area */}
+                <div
+                    className="joystick"
+                    style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '50%', border: '2px solid black', overflow: 'hidden' }}
+                    onPointerDown={handleJoystickMove}
+                    onPointerMove={handleJoystickMove}
+                    onPointerUp={stopJoystick}
+                    onPointerLeave={stopJoystick}
+                >
+                    <div
+                        style={{
+                            position: 'absolute',
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '50%',
+                            backgroundColor: 'blue',
+                            transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)`,
+                            transition: 'transform 0.1s',
+                        }}
+                    />
                 </div>
             </div>
 
