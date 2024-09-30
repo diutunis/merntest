@@ -5,6 +5,7 @@ import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
+    const offscreenCanvasRef = useRef(null); // Offscreen canvas to store drawings
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
     const [page, setPage] = useState(1);
@@ -15,12 +16,21 @@ const HomePage = () => {
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
-    const [pathCommands, setPathCommands] = useState([]); // Stores drawing commands
+    const [offscreenContext, setOffscreenContext] = useState(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
+
+        // Setup offscreen canvas
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = canvas.width;
+        offscreenCanvas.height = canvas.height;
+        const offscreenCtx = offscreenCanvas.getContext('2d');
+        offscreenCanvasRef.current = offscreenCanvas;
+        setOffscreenContext(offscreenCtx);
+
         ctx.setTransform(1, 0, 0, 1, 0, 0); // Set initial transformation
     }, []);
 
@@ -71,6 +81,8 @@ const HomePage = () => {
         const { x, y } = getPosition(nativeEvent);
         context.beginPath();
         context.moveTo(x, y);
+        offscreenContext.beginPath();
+        offscreenContext.moveTo(x, y);
     };
 
     const draw = (nativeEvent) => {
@@ -80,8 +92,9 @@ const HomePage = () => {
         context.lineTo(x, y);
         context.stroke();
 
-        // Save the drawing command (lineTo) to pathCommands
-        setPathCommands((prevCommands) => [...prevCommands, { type: 'lineTo', x, y }]);
+        // Also draw on the offscreen canvas
+        offscreenContext.lineTo(x, y);
+        offscreenContext.stroke();
     };
 
     const stopDrawing = (nativeEvent) => {
@@ -89,15 +102,16 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
+        offscreenContext.closePath(); // Close the path on the offscreen canvas
     };
 
     const clearCanvas = () => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        setPathCommands([]); // Clear saved path commands
+        offscreenContext.clearRect(0, 0, offscreenCanvasRef.current.width, offscreenCanvasRef.current.height);
     };
 
     const saveDrawing = async () => {
-        const drawing = canvasRef.current.toDataURL('image/png');
+        const drawing = offscreenCanvasRef.current.toDataURL('image/png');
         const response = await fetch('https://merntest-1.onrender.com/api/drawings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -170,20 +184,16 @@ const HomePage = () => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
         context.lineWidth = 1 / newZoom; // Adjust line width based on zoom
 
+        // Redraw the offscreen canvas content on the visible canvas
         redrawCanvas();
     };
 
     const redrawCanvas = () => {
-        clearCanvas();
+        // Clear the visible canvas
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-        // Redraw all saved path commands
-        context.beginPath();
-        pathCommands.forEach((command) => {
-            if (command.type === 'lineTo') {
-                context.lineTo(command.x, command.y);
-                context.stroke();
-            }
-        });
+        // Redraw the offscreen canvas onto the visible canvas
+        context.drawImage(offscreenCanvasRef.current, 0, 0);
     };
 
     return (
