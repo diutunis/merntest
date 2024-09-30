@@ -169,29 +169,34 @@ const HomePage = () => {
     };
 
     // Handle joystick movement
-    const handleJoystickMove = (nativeEvent) => {
-        const rect = nativeEvent.currentTarget.getBoundingClientRect();
-        const joystickX = nativeEvent.clientX - rect.left - joystickRadius;
-        const joystickY = nativeEvent.clientY - rect.top - joystickRadius;
+   const handleJoystickMove = (nativeEvent) => {
+    const rect = nativeEvent.currentTarget.getBoundingClientRect();
+    let joystickX = nativeEvent.clientX - rect.left - joystickRadius;
+    let joystickY = nativeEvent.clientY - rect.top - joystickRadius;
 
-        const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
-        const angle = Math.atan2(joystickY, joystickX);
+    const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
+    const angle = Math.atan2(joystickY, joystickX);
 
-        if (distance > joystickRadius) {
-            joystickX = joystickRadius * Math.cos(angle);
-            joystickY = joystickRadius * Math.sin(angle);
-        }
+    if (distance > joystickRadius) {
+        joystickX = joystickRadius * Math.cos(angle);
+        joystickY = joystickRadius * Math.sin(angle);
+    }
 
-        setJoystickPosition({ x: joystickX, y: joystickY });
+    setJoystickPosition({ x: joystickX, y: joystickY });
 
-        // Update pan based on joystick position
-        setPan((prevPan) => ({
-            x: prevPan.x - joystickX / 10,
-            y: prevPan.y - joystickY / 10,
-        }));
+    // Update pan based on joystick position
+    setPan((prevPan) => ({
+        x: prevPan.x - joystickX / 10,
+        y: prevPan.y - joystickY / 10,
+    }));
 
-        applyTransformation(zoom, { x: prevPan.x - joystickX / 10, y: prevPan.y - joystickY / 10 });
-    };
+    // Apply transformation
+    applyTransformation(zoom, {
+        x: joystickX,
+        y: joystickY,
+    });
+};
+
 
     const stopJoystick = () => {
         setJoystickPosition({ x: 0, y: 0 });
