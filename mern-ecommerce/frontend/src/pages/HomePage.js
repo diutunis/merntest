@@ -169,38 +169,39 @@ const HomePage = () => {
     };
 
     // Handle joystick movement
-   const handleJoystickMove = (nativeEvent) => {
-    const rect = nativeEvent.currentTarget.getBoundingClientRect();
-    let joystickX = nativeEvent.clientX - rect.left - joystickRadius;
-    let joystickY = nativeEvent.clientY - rect.top - joystickRadius;
+    const handleJoystickMove = (nativeEvent) => {
+        const rect = nativeEvent.currentTarget.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
 
-    const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
-    const angle = Math.atan2(joystickY, joystickX);
+        let joystickX = nativeEvent.clientX - rect.left - centerX;
+        let joystickY = nativeEvent.clientY - rect.top - centerY;
 
-    if (distance > joystickRadius) {
-        joystickX = joystickRadius * Math.cos(angle);
-        joystickY = joystickRadius * Math.sin(angle);
-    }
+        const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
+        const angle = Math.atan2(joystickY, joystickX);
 
-    setJoystickPosition({ x: joystickX, y: joystickY });
+        if (distance > joystickRadius) {
+            joystickX = joystickRadius * Math.cos(angle);
+            joystickY = joystickRadius * Math.sin(angle);
+        }
 
-    // Update pan based on joystick position
-    setPan((prevPan) => ({
-        x: prevPan.x - joystickX / 10,
-        y: prevPan.y - joystickY / 10,
-    }));
+        setJoystickPosition({ x: joystickX, y: joystickY });
 
-    // Apply transformation
-    applyTransformation(zoom, {
-        x: joystickX,
-        y: joystickY,
-    });
-};
+        // Update pan based on joystick position
+        setPan((prevPan) => ({
+            x: prevPan.x - joystickX / 10,
+            y: prevPan.y - joystickY / 10,
+        }));
 
+        // Apply transformation
+        applyTransformation(zoom, {
+            x: pan.x - joystickX / 10,
+            y: pan.y - joystickY / 10,
+        });
+    };
 
     const stopJoystick = () => {
-        setJoystickPosition({ x: 0, y: 0 });
-        setPan({ x: 0, y: 0 }); // Reset pan or keep the current one
+        setJoystickPosition({ x: 0, y: 0 }); // Reset to center
     };
 
     return (
@@ -230,7 +231,14 @@ const HomePage = () => {
                 {/* Joystick Area */}
                 <div
                     className="joystick"
-                    style={{ position: 'relative', width: '100px', height: '100px', borderRadius: '50%', border: '2px solid black', overflow: 'hidden' }}
+                    style={{
+                        position: 'relative',
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '50%',
+                        border: '2px solid black',
+                        overflow: 'hidden',
+                    }}
                     onPointerDown={handleJoystickMove}
                     onPointerMove={handleJoystickMove}
                     onPointerUp={stopJoystick}
