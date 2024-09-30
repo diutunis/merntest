@@ -15,14 +15,12 @@ const HomePage = () => {
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
-    const [initialLineWidth, setInitialLineWidth] = useState(1);
     const [savedCanvasImage, setSavedCanvasImage] = useState(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
-        setInitialLineWidth(ctx.lineWidth); // Save the initial line width for scaling later
         ctx.setTransform(1, 0, 0, 1, 0, 0); // Set initial transformation
     }, []);
 
@@ -88,6 +86,7 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
+        saveCanvasState(); // Save the canvas state after drawing stops
     };
 
     const clearCanvas = () => {
@@ -168,20 +167,20 @@ const HomePage = () => {
 
     const applyTransformation = (newZoom, newPan) => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
-        context.lineWidth = initialLineWidth / newZoom; // Scale the line width inversely to the zoom level
+        context.lineWidth = 1 / newZoom; // Scale the line width inversely to the zoom level
 
         redrawCanvas();
     };
 
     const saveCanvasState = () => {
         const canvas = canvasRef.current;
-        setSavedCanvasImage(canvas.toDataURL());
+        setSavedCanvasImage(canvas.toDataURL());  // Save current drawing content
     };
 
     const redrawCanvas = () => {
         clearCanvas();
 
-        // Redraw saved image if any
+        // Redraw saved image (only the current canvas content)
         if (savedCanvasImage) {
             const img = new Image();
             img.src = savedCanvasImage;
@@ -189,15 +188,6 @@ const HomePage = () => {
                 context.drawImage(img, 0, 0);
             };
         }
-
-        // Redraw all saved drawings after transformation
-        drawings.forEach((drawing) => {
-            const img = new Image();
-            img.src = drawing.drawing; // Use the drawing's data
-            img.onload = () => {
-                context.drawImage(img, 0, 0);
-            };
-        });
     };
 
     return (
