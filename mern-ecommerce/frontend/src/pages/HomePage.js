@@ -5,7 +5,7 @@ import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
-    const offscreenCanvasRef = useRef(null);
+    const offscreenCanvasRef = useRef(null); // Offscreen canvas to store drawings
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
     const [page, setPage] = useState(1);
@@ -17,14 +17,13 @@ const HomePage = () => {
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
-    const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
-    const [isJoystickActive, setIsJoystickActive] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
 
+        // Setup offscreen canvas
         const offscreenCanvas = document.createElement('canvas');
         offscreenCanvas.width = canvas.width;
         offscreenCanvas.height = canvas.height;
@@ -32,7 +31,7 @@ const HomePage = () => {
         offscreenCanvasRef.current = offscreenCanvas;
         setOffscreenContext(offscreenCtx);
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Set initial transformation
     }, []);
 
     const fetchDrawings = async () => {
@@ -93,6 +92,7 @@ const HomePage = () => {
         context.lineTo(x, y);
         context.stroke();
 
+        // Also draw on the offscreen canvas
         offscreenContext.lineTo(x, y);
         offscreenContext.stroke();
     };
@@ -102,7 +102,7 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-        offscreenContext.closePath();
+        offscreenContext.closePath(); // Close the path on the offscreen canvas
     };
 
     const clearCanvas = () => {
@@ -135,7 +135,7 @@ const HomePage = () => {
     };
 
     const preventScroll = (e) => {
-        if (isDrawing || isJoystickActive) {
+        if (isDrawing) {
             e.preventDefault();
         }
     };
@@ -147,7 +147,7 @@ const HomePage = () => {
             window.removeEventListener('touchmove', preventScroll);
             window.removeEventListener('wheel', preventScroll);
         };
-    }, [isDrawing, isJoystickActive]);
+    }, [isDrawing]);
 
     const handleZoomChange = (e) => {
         const newZoom = parseFloat(e.target.value);
@@ -155,86 +155,45 @@ const HomePage = () => {
         setZoom(newZoom);
     };
 
+    const handlePan = (direction) => {
+        const panStep = 10;
+        const newPan = { ...pan };
+
+        switch (direction) {
+            case 'up':
+                newPan.y -= panStep;
+                break;
+            case 'down':
+                newPan.y += panStep;
+                break;
+            case 'left':
+                newPan.x -= panStep;
+                break;
+            case 'right':
+                newPan.x += panStep;
+                break;
+            default:
+                break;
+        }
+
+        applyTransformation(zoom, newPan);
+        setPan(newPan);
+    };
+
     const applyTransformation = (newZoom, newPan) => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
-        context.lineWidth = 1 / newZoom;
+        context.lineWidth = 1 / newZoom; // Adjust line width based on zoom
 
+        // Redraw the offscreen canvas content on the visible canvas
         redrawCanvas();
     };
 
     const redrawCanvas = () => {
+        // Clear the visible canvas
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+        // Redraw the offscreen canvas onto the visible canvas
         context.drawImage(offscreenCanvasRef.current, 0, 0);
-    };
-
-    // Joystick handling
-    const handleJoystickMove = (event) => {
-        if (!isJoystickActive) return;
-
-        const joystick = document.getElementById('joystick');
-        const rect = joystick.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-
-        const dx = event.clientX - centerX;
-        const dy = event.clientY - centerY;
-
-        const maxDistance = rect.width / 2;
-
-        // Normalize the joystick handle's position
-        const distance = Math.min(Math.sqrt(dx * dx + dy * dy), maxDistance);
-        const angle = Math.atan2(dy, dx);
-
-        // Update joystick position
-        setJoystickPos({
-            x: Math.cos(angle) * distance,
-            y: Math.sin(angle) * distance,
-        });
-
-        // Update pan position
-        const panStep = 10;
-        setPan((prev) => ({
-            x: prev.x - (Math.cos(angle) * panStep * (distance / maxDistance)),
-            y: prev.y - (Math.sin(angle) * panStep * (distance / maxDistance)),
-        }));
-
-        redrawCanvas();
-    };
-
-    const handleJoystickUp = () => {
-        setIsJoystickActive(false);
-        setJoystickPos({ x: 0, y: 0 }); // Reset joystick position
-        document.removeEventListener('mousemove', handleJoystickMove);
-        document.removeEventListener('mouseup', handleJoystickUp);
-        document.removeEventListener('touchmove', handleJoystickMove);
-        document.removeEventListener('touchend', handleJoystickUp);
-    };
-
-    const handleJoystickDown = (event) => {
-        event.preventDefault();
-        setIsJoystickActive(true);
-        document.addEventListener('mousemove', handleJoystickMove);
-        document.addEventListener('mouseup', handleJoystickUp);
-        document.addEventListener('touchmove', handleJoystickMove);
-        document.addEventListener('touchend', handleJoystickUp);
-    };
-
-    // Touch event handlers for drawing
-    const handleCanvasTouchStart = (e) => {
-        e.preventDefault(); // Prevent scrolling
-        const touch = e.touches[0];
-        startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
-    };
-
-    const handleCanvasTouchMove = (e) => {
-        e.preventDefault(); // Prevent scrolling
-        const touch = e.touches[0];
-        draw({ clientX: touch.clientX, clientY: touch.clientY });
-    };
-
-    const handleCanvasTouchEnd = (e) => {
-        e.preventDefault();
-        stopDrawing(e);
     };
 
     return (
@@ -244,46 +203,34 @@ const HomePage = () => {
                 onMouseDown={startDrawing}
                 onMouseMove={draw}
                 onMouseUp={stopDrawing}
-                onTouchStart={handleCanvasTouchStart}
-                onTouchMove={handleCanvasTouchMove}
-                onTouchEnd={handleCanvasTouchEnd}
-                width={800}
-                height={600}
-                style={{ border: '1px solid black', touchAction: 'none' }} // Prevent scrolling
+                onMouseLeave={stopDrawing}
+                onTouchStart={startDrawing}
+                onTouchMove={draw}
+                onTouchEnd={stopDrawing}
+                className="drawing-canvas"
+                width={500}
+                height={500}
             />
-            <input
-                type="range"
-                min="0.5"
-                max="5"
-                step="0.1"
-                value={zoom}
-                onChange={handleZoomChange}
-            />
-            <div
-                id="joystick"
-                onMouseDown={handleJoystickDown}
-                onTouchStart={handleJoystickDown}
-                style={{
-                    position: 'relative',
-                    width: '100px',
-                    height: '100px',
-                    backgroundColor: 'rgba(200, 200, 200, 0.5)',
-                    borderRadius: '50%',
-                    overflow: 'hidden',
-                }}
-            >
-                <div
-                    className="joystick-handle"
-                    style={{
-                        position: 'absolute',
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: 'blue',
-                        borderRadius: '50%',
-                        transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
-                        transition: 'transform 0.1s',
-                    }}
+            <div className="controls">
+                <label htmlFor="zoom">Zoom: {zoom}</label>
+                <input
+                    type="range"
+                    id="zoom"
+                    min="0.5"
+                    max="3"
+                    step="0.1"
+                    value={zoom}
+                    onChange={handleZoomChange}
                 />
+
+                <div className="joystick">
+                    <button onClick={() => handlePan('up')}>↑</button>
+                    <div>
+                        <button onClick={() => handlePan('left')}>←</button>
+                        <button onClick={() => handlePan('right')}>→</button>
+                    </div>
+                    <button onClick={() => handlePan('down')}>↓</button>
+                </div>
             </div>
 
             <button onClick={saveDrawing}>Post</button>
