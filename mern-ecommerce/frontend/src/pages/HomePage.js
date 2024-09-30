@@ -5,7 +5,7 @@ import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
-    const offscreenCanvasRef = useRef(null); // Offscreen canvas to store drawings
+    const offscreenCanvasRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [drawings, setDrawings] = useState([]);
     const [page, setPage] = useState(1);
@@ -23,7 +23,6 @@ const HomePage = () => {
         const ctx = canvas.getContext('2d');
         setContext(ctx);
 
-        // Setup offscreen canvas
         const offscreenCanvas = document.createElement('canvas');
         offscreenCanvas.width = canvas.width;
         offscreenCanvas.height = canvas.height;
@@ -31,7 +30,7 @@ const HomePage = () => {
         offscreenCanvasRef.current = offscreenCanvas;
         setOffscreenContext(offscreenCtx);
 
-        ctx.setTransform(1, 0, 0, 1, 0, 0); // Set initial transformation
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
     }, []);
 
     const fetchDrawings = async () => {
@@ -92,7 +91,6 @@ const HomePage = () => {
         context.lineTo(x, y);
         context.stroke();
 
-        // Also draw on the offscreen canvas
         offscreenContext.lineTo(x, y);
         offscreenContext.stroke();
     };
@@ -102,7 +100,7 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-        offscreenContext.closePath(); // Close the path on the offscreen canvas
+        offscreenContext.closePath();
     };
 
     const clearCanvas = () => {
@@ -182,18 +180,56 @@ const HomePage = () => {
 
     const applyTransformation = (newZoom, newPan) => {
         context.setTransform(newZoom, 0, 0, newZoom, newPan.x, newPan.y);
-        context.lineWidth = 1 / newZoom; // Adjust line width based on zoom
+        context.lineWidth = 1 / newZoom; 
 
-        // Redraw the offscreen canvas content on the visible canvas
         redrawCanvas();
     };
 
     const redrawCanvas = () => {
-        // Clear the visible canvas
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-        // Redraw the offscreen canvas onto the visible canvas
         context.drawImage(offscreenCanvasRef.current, 0, 0);
+    };
+
+    // Joystick handling
+    const handleJoystickMove = (event) => {
+        const joystick = document.getElementById('joystick');
+        const rect = joystick.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const dx = event.clientX - centerX;
+        const dy = event.clientY - centerY;
+
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = rect.width / 2;
+
+        if (distance > maxDistance) {
+            const angle = Math.atan2(dy, dx);
+            const adjustedX = Math.cos(angle) * maxDistance;
+            const adjustedY = Math.sin(angle) * maxDistance;
+            setPan((prev) => ({
+                x: prev.x - adjustedX / zoom,
+                y: prev.y - adjustedY / zoom,
+            }));
+        } else {
+            setPan((prev) => ({
+                x: prev.x - dx / zoom,
+                y: prev.y - dy / zoom,
+            }));
+        }
+
+        redrawCanvas();
+    };
+
+    const handleJoystickUp = () => {
+        document.removeEventListener('mousemove', handleJoystickMove);
+        document.removeEventListener('mouseup', handleJoystickUp);
+    };
+
+    const handleJoystickDown = (event) => {
+        event.preventDefault();
+        document.addEventListener('mousemove', handleJoystickMove);
+        document.addEventListener('mouseup', handleJoystickUp);
     };
 
     return (
@@ -223,13 +259,8 @@ const HomePage = () => {
                     onChange={handleZoomChange}
                 />
 
-                <div className="joystick">
-                    <button onClick={() => handlePan('up')}>↑</button>
-                    <div>
-                        <button onClick={() => handlePan('left')}>←</button>
-                        <button onClick={() => handlePan('right')}>→</button>
-                    </div>
-                    <button onClick={() => handlePan('down')}>↓</button>
+                <div className="joystick" id="joystick" onMouseDown={handleJoystickDown}>
+                    <div className="joystick-handle" />
                 </div>
             </div>
 

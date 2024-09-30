@@ -35,3 +35,29 @@ button {
     width: 150px;
     height: 150px;
 }
+
+
+.joystick {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    margin: 20px;
+}
+
+.joystick-handle {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: background-color 0.2s;
+}
+
+.joystick-handle:active {
+    background-color: #388E3C; /* Darker green when pressed */
+}
