@@ -39,25 +39,18 @@ button {
 
 .joystick {
     position: relative;
-    width: 100px;
+    width: 100px; /* Size of the joystick base */
     height: 100px;
-    border: 2px solid #333;
+    background-color: rgba(200, 200, 200, 0.5);
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.8);
-    margin: 20px;
+    overflow: hidden;
 }
 
 .joystick-handle {
     position: absolute;
-    width: 40px;
+    width: 40px; /* Size of the joystick handle */
     height: 40px;
+    background-color: blue;
     border-radius: 50%;
-    background-color: #4CAF50;
-    cursor: pointer;
-    transform: translate(-50%, -50%);
-    transition: background-color 0.2s;
-}
-
-.joystick-handle:active {
-    background-color: #388E3C; /* Darker green when pressed */
+    transition: transform 0.1s; /* Smooth movement */
 }

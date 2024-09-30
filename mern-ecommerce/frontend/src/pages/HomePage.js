@@ -17,6 +17,8 @@ const HomePage = () => {
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
+    const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
+    const [isJoystickActive, setIsJoystickActive] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -192,6 +194,8 @@ const HomePage = () => {
 
     // Joystick handling
     const handleJoystickMove = (event) => {
+        if (!isJoystickActive) return;
+
         const joystick = document.getElementById('joystick');
         const rect = joystick.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
@@ -203,15 +207,19 @@ const HomePage = () => {
         const distance = Math.sqrt(dx * dx + dy * dy);
         const maxDistance = rect.width / 2;
 
+        // Move the joystick handle
         if (distance > maxDistance) {
             const angle = Math.atan2(dy, dx);
             const adjustedX = Math.cos(angle) * maxDistance;
             const adjustedY = Math.sin(angle) * maxDistance;
+
+            setJoystickPos({ x: adjustedX, y: adjustedY });
             setPan((prev) => ({
                 x: prev.x - adjustedX / zoom,
                 y: prev.y - adjustedY / zoom,
             }));
         } else {
+            setJoystickPos({ x: dx, y: dy });
             setPan((prev) => ({
                 x: prev.x - dx / zoom,
                 y: prev.y - dy / zoom,
@@ -222,12 +230,15 @@ const HomePage = () => {
     };
 
     const handleJoystickUp = () => {
+        setIsJoystickActive(false);
+        setJoystickPos({ x: 0, y: 0 }); // Reset joystick position
         document.removeEventListener('mousemove', handleJoystickMove);
         document.removeEventListener('mouseup', handleJoystickUp);
     };
 
     const handleJoystickDown = (event) => {
         event.preventDefault();
+        setIsJoystickActive(true);
         document.addEventListener('mousemove', handleJoystickMove);
         document.addEventListener('mouseup', handleJoystickUp);
     };
@@ -259,8 +270,31 @@ const HomePage = () => {
                     onChange={handleZoomChange}
                 />
 
-                <div className="joystick" id="joystick" onMouseDown={handleJoystickDown}>
-                    <div className="joystick-handle" />
+                <div
+                    className="joystick"
+                    id="joystick"
+                    onMouseDown={handleJoystickDown}
+                    style={{
+                        position: 'relative',
+                        width: '100px',
+                        height: '100px',
+                        backgroundColor: 'rgba(200, 200, 200, 0.5)',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                    }}
+                >
+                    <div
+                        className="joystick-handle"
+                        style={{
+                            position: 'absolute',
+                            width: '40px',
+                            height: '40px',
+                            backgroundColor: 'blue',
+                            borderRadius: '50%',
+                            transform: `translate(${joystickPos.x}px, ${joystickPos.y}px)`,
+                            transition: 'transform 0.1s',
+                        }}
+                    />
                 </div>
             </div>
 
