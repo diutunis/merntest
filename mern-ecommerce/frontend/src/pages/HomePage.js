@@ -75,19 +75,8 @@ const HomePage = () => {
         return { x, y };
     };
 
-    const handleTouchStart = (e) => {
-        e.preventDefault();
-        const touch = e.touches[0]; // Get the first touch point
-        startDrawing(touch);
-    };
-
-    const handleTouchMove = (e) => {
-        e.preventDefault();
-        const touch = e.touches[0]; // Get the first touch point
-        draw(touch);
-    };
-
     const startDrawing = (nativeEvent) => {
+        nativeEvent.preventDefault();
         setIsDrawing(true);
         const { x, y } = getPosition(nativeEvent);
         context.beginPath();
@@ -98,6 +87,7 @@ const HomePage = () => {
 
     const draw = (nativeEvent) => {
         if (!isDrawing) return;
+        nativeEvent.preventDefault();
         const { x, y } = getPosition(nativeEvent);
         context.lineTo(x, y);
         context.stroke();
@@ -109,9 +99,23 @@ const HomePage = () => {
 
     const stopDrawing = (nativeEvent) => {
         if (!isDrawing) return;
+        nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
         offscreenContext.closePath();
+    };
+
+    const handleTouchStart = (e) => {
+        // Prevent default to avoid scrolling
+        e.preventDefault();
+        const touch = e.touches[0]; // Get the first touch point
+        startDrawing(touch);
+    };
+
+    const handleTouchMove = (e) => {
+        e.preventDefault(); // Prevent scrolling
+        const touch = e.touches[0]; // Get the first touch point
+        draw(touch);
     };
 
     const clearCanvas = () => {

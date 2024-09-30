@@ -36,21 +36,3 @@ button {
     height: 150px;
 }
 
-
-.joystick {
-    position: relative;
-    width: 100px; /* Size of the joystick base */
-    height: 100px;
-    background-color: rgba(200, 200, 200, 0.5);
-    border-radius: 50%;
-    overflow: hidden;
-}
-
-.joystick-handle {
-    position: absolute;
-    width: 40px; /* Size of the joystick handle */
-    height: 40px;
-    background-color: blue;
-    border-radius: 50%;
-    transition: transform 0.1s; /* Smooth movement */
-}
