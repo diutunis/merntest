@@ -15,7 +15,7 @@ const HomePage = () => {
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
-    const [paths, setPaths] = useState([]);  // To store drawn paths
+    const [pathCommands, setPathCommands] = useState([]); // Stores drawing commands
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -79,6 +79,9 @@ const HomePage = () => {
         const { x, y } = getPosition(nativeEvent);
         context.lineTo(x, y);
         context.stroke();
+
+        // Save the drawing command (lineTo) to pathCommands
+        setPathCommands((prevCommands) => [...prevCommands, { type: 'lineTo', x, y }]);
     };
 
     const stopDrawing = (nativeEvent) => {
@@ -86,15 +89,11 @@ const HomePage = () => {
         nativeEvent.preventDefault();
         setIsDrawing(false);
         context.closePath();
-
-        // Save current drawing path to the paths array
-        const currentPath = context.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
-        setPaths((prevPaths) => [...prevPaths, currentPath]);
     };
 
     const clearCanvas = () => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-        setPaths([]);  // Clear saved paths
+        setPathCommands([]); // Clear saved path commands
     };
 
     const saveDrawing = async () => {
@@ -177,9 +176,13 @@ const HomePage = () => {
     const redrawCanvas = () => {
         clearCanvas();
 
-        // Redraw the stored paths
-        paths.forEach((path) => {
-            context.putImageData(path, 0, 0);
+        // Redraw all saved path commands
+        context.beginPath();
+        pathCommands.forEach((command) => {
+            if (command.type === 'lineTo') {
+                context.lineTo(command.x, command.y);
+                context.stroke();
+            }
         });
     };
 
@@ -242,4 +245,4 @@ const HomePage = () => {
     );
 };
 
-export default HomePage
+export default HomePage;
