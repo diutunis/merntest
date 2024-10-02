@@ -20,7 +20,7 @@ const HomePage = () => {
 
     // Joystick state
     const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
-    const joystickRadius = 50; // Radius of the joystick circle
+    const joystickRadius = 70; // Radius of the joystick circle
     const [isJoystickActive, setIsJoystickActive] = useState(false); // Track joystick usage
 
     useEffect(() => {
@@ -240,6 +240,7 @@ const HomePage = () => {
                     step="0.1"
                     value={zoom}
                     onChange={handleZoomChange}
+ className="zoom-slider"
                 />
 
                 {/* Joystick Area */}

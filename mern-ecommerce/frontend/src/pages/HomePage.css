@@ -36,3 +36,25 @@ button {
     height: 150px;
 }
 
+/* Custom styles for the zoom slider */
+.zoom-slider {
+    width: 200px; /* Adjust the width to your preference */
+    height: 50px; /* Adjust the height for a thicker slider */
+}
+
+.zoom-slider::-webkit-slider-thumb {
+    width: 25px; /* Adjust for a larger thumb */
+    height: 25px; /* Adjust for a larger thumb */
+    background-color: #007bff; /* Customize thumb color */
+    border-radius: 50%; /* Make it circular */
+    cursor: pointer;
+}
+
+.zoom-slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background-color: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
