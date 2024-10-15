@@ -23,7 +23,7 @@ const AudioPlayer = ({ playlist }) => {
   }, []);
 
   return (
-    <audio ref={audioRef} controls style={{ display: 'none' }} />
+    <audio ref={audioRef} controls style={{ width: '100%' }} />
   );
 };
 
