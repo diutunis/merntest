@@ -23,6 +23,7 @@ function App() {
   return (
     <Router>
       <div className="app-container">
+ <AudioPlayer playlist={playlist} /> {/* Autoplay music */}
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/blog" element={<BlogPage />} />
@@ -31,7 +32,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
         </Routes>
         <BottomNav />
-        <AudioPlayer playlist={playlist} /> {/* Autoplay music */}
+       
       </div>
     </Router>
   );
