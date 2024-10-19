@@ -205,7 +205,92 @@ const HomePage = () => {
 
     return (
         <div className="drawing-container">
-            {/* Canvas and controls go here */}
+            <canvas
+                ref={canvasRef}
+                onPointerDown={(e) => startDrawing(e)}
+                onPointerMove={(e) => draw(e)}
+                onPointerUp={(e) => stopDrawing(e)}
+                className="drawing-canvas"
+                width={500}
+                height={500}
+            />
+            <div className="controls">
+                <label htmlFor="zoom">Zoom: {zoom}</label>
+                <input
+                    type="range"
+                    id="zoom"
+                    min="0.5"
+                    max="3"
+                    step="0.1"
+                    value={zoom}
+                    onChange={(e) => setZoom(parseFloat(e.target.value))}
+                />
+
+                <div
+                    className="joystick"
+                    style={{ width: joystickRadius * 2, height: joystickRadius * 2 }}
+                    onPointerDown={() => setIsJoystickActive(true)}
+                    onPointerUp={() => setIsJoystickActive(false)}
+                >
+                    <div
+                        className="joystick-handle"
+                        style={{
+                            transform: `translate(${joystickPosition.x + joystickRadius - 15}px, 
+                                         ${joystickPosition.y + joystickRadius - 15}px)`,
+                        }}
+                    />
+                </div>
+            </div>
+
+            <button onClick={saveDrawing}>Post</button>
+            <button onClick={clearCanvas}>Clear</button>
+
+            <div className="posted-drawings">
+                {drawings.map((drawing) => (
+                    <div key={drawing._id} className="drawing-item">
+                        <img src={drawing.drawing} alt="User drawing" />
+                        <div className="like-section">
+                            <button onClick={() => handleLike(drawing._id)}>
+                                <FontAwesomeIcon icon={faHandSparkles} />
+                            </button>
+                            <span>{drawing.likes || 0}</span>
+                        </div>
+
+                        <div className="audio-section">
+                            {recording ? (
+                                <button onClick={stopRecording}>
+                                    <FontAwesomeIcon icon={faStop} /> Stop
+                                </button>
+                            ) : (
+                                <button onClick={startRecording}>
+                                    <FontAwesomeIcon icon={faMicrophone} /> Record
+                                </button>
+                            )}
+
+                            {audioURL && (
+                                <>
+                                    <button onClick={() => playAudio(audioURL)}>
+                                        <FontAwesomeIcon icon={faPlay} /> Play
+                                    </button>
+                                    <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>
+                                        Upload
+                                    </button>
+                                </>
+                            )}
+
+                            <div className="comments">
+                                {drawing.comments?.map((comment, index) => (
+                                    <div key={index} className="audio-comment">
+                                        <button onClick={() => playAudio(comment.audioURL)}>
+                                            <FontAwesomeIcon icon={faPlay} /> Play Comment
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
