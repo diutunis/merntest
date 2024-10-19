@@ -5,16 +5,6 @@ import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-
 
 
 
-const AudioComment = ({ audioURL }) => {
-    return (
-        <div>
-            <audio controls playsInline preload="auto">
-                <source src={audioURL} type="audio/webm" />
-                Your browser does not support the audio element.
-            </audio>
-        </div>
-    );
-};
 
 
 const HomePage = () => {
@@ -156,8 +146,7 @@ const HomePage = () => {
 
 
 
-const AudioContext = window.AudioContext || window.webkitAudioContext;
-const audioContext = new AudioContext();
+
 
 
 
@@ -209,6 +198,19 @@ const audioContext = new AudioContext();
         console.log('Audio uploaded successfully:', data);
     } catch (error) {
         console.error('Error uploading audio:', error);
+    }
+};
+
+
+const playAudio = async (audioURL) => {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        await audioContext.resume(); // Ensure the audio context is resumed on iOS
+
+        const audio = new Audio(audioURL);
+        audio.play().catch((error) => console.error('Playback error:', error));
+    } catch (error) {
+        console.error('Audio context or playback issue:', error);
     }
 };
 
@@ -379,20 +381,27 @@ const audioContext = new AudioContext();
                                 </button>
                             )}
 
-                            {audioURL && (
-                                <>
-                                    <audio controls src={audioURL}></audio>
-                                    <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>Upload</button>
-                                </>
-                            )}
+                           {audioURL && (
+    <>
+        <button onClick={() => playAudio(audioURL)}>
+            <FontAwesomeIcon icon={faPlay} /> Play 
+        </button>
+        <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>
+            Upload
+        </button>
+    </>
+)}
 
-                            <div className="comments">
-                                {drawing.comments?.map((comment, index) => (
-                                    <div key={index} className="audio-comment">
-                                        <audio controls playsInline preload="auto" src={comment.audioURL}></audio>
-                                    </div>
-                                ))}
-                            </div>
+<div className="comments">
+    {drawing.comments?.map((comment, index) => (
+        <div key={index} className="audio-comment">
+            <button onClick={() => playAudio(comment.audioURL)}>
+                <FontAwesomeIcon icon={faPlay} /> Play Comment 
+            </button>
+        </div>
+    ))}
+</div>
+
                         </div>
                     </div>
                 ))}
