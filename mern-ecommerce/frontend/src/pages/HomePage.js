@@ -389,7 +389,7 @@ const audioContext = new AudioContext();
                             <div className="comments">
                                 {drawing.comments?.map((comment, index) => (
                                     <div key={index} className="audio-comment">
-                                        <audio controls src={comment.audioURL}></audio>
+                                        <audio controls playsInline preload="auto" src={comment.audioURL}></audio>
                                     </div>
                                 ))}
                             </div>
