@@ -89,7 +89,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/products', productRoutes);
-app.use('/api', drawingRoutes); // Prefix "/api" applied
+
 
 
 // Start the server
