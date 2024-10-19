@@ -139,6 +139,12 @@ const HomePage = () => {
             )
         );
     };
+
+const audio = new Audio(audioURL);
+audio.play().catch((error) => {
+    console.error('Playback error:', error);
+});
+
  const startRecording = () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream) => {
