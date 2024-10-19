@@ -3,6 +3,20 @@ import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 
+
+
+const AudioComment = ({ audioURL }) => {
+    return (
+        <div>
+            <audio controls playsInline preload="auto">
+                <source src={audioURL} type="audio/webm" />
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+    );
+};
+
+
 const HomePage = () => {
     const canvasRef = useRef(null);
     const offscreenCanvasRef = useRef(null);
