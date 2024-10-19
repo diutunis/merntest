@@ -19,7 +19,12 @@ const app = express();
 
 // Use middleware
 
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins (you can restrict this to specific origins if needed)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // Allow cookies or authorization headers, if needed
+}));
 app.use(express.json());
 app.use(bodyParser.json({ limit: '10mb' })); // Set higher limit for large base64 strings
 
