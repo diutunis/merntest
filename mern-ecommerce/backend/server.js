@@ -2,8 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const drawingRoutes = require('./routes/drawingRoutes');
-//const productRoutes = require('./routes/productRoutes');
+//const drawingRoutes = require('./routes/drawingRoutes');
+const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
 const Drawing = require('./models/Drawing'); // Correcting the path to the model
 
@@ -89,9 +89,9 @@ app.get('/', (req, res) => {
     res.send('API is running...');
 });
 
-//app.use('/api/products', productRoutes);
+app.use('/api/products', productRoutes);
 
-app.use('/api', drawingRoutes); // Prefix "/api" applied
+//app.use('/api', drawingRoutes); // Prefix "/api" applied
 
 
 // Start the server

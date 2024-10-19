@@ -165,19 +165,22 @@ const HomePage = () => {
         mediaRecorderRef.current?.stop();
     };
 
-    const handleAudioUpload = async (drawingId, audioFile) => {
+   const handleAudioUpload = async (drawingId, audioFile) => {
     const formData = new FormData();
     formData.append('audio', audioFile);
 
     try {
-        const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`, {
-            method: 'POST',
-            body: formData,
-        });
+        const response = await fetch(
+            `https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`,
+            {
+                method: 'POST',
+                body: formData,
+            }
+        );
 
         if (!response.ok) {
-            const errorData = await response.text();
-            throw new Error(`Server error: ${errorData}`);
+            const errorText = await response.text();
+            throw new Error(`Server error: ${errorText}`);
         }
 
         const data = await response.json();
@@ -186,6 +189,7 @@ const HomePage = () => {
         console.error('Error uploading audio:', error);
     }
 };
+
 
 
     const preventScroll = (e) => {
