@@ -181,28 +181,29 @@ const HomePage = () => {
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-let audioContext;
+let audioContext; // Declare once globally
 
 const playAudio = async (audioURL) => {
+    // Initialize audio context if it doesn't exist
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
     try {
+        // Resume audio context if it's suspended (for Safari compatibility)
         if (audioContext.state === 'suspended') {
             await audioContext.resume();
         }
 
         const audio = new Audio(audioURL);
-        audio.crossOrigin = 'anonymous';
-        audio.playsInline = true;
+        audio.crossOrigin = 'anonymous'; // Prevent CORS issues
+        audio.playsInline = true; // Required for iOS Safari
         await audio.play();
     } catch (error) {
         console.error('Audio playback error:', error);
     }
 };
+
 
 
 
