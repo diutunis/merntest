@@ -145,10 +145,6 @@ audioContext.resume().then(() => {
     audio.play().catch((error) => console.error('Playback error:', error));
 });
 
-const audio = new Audio(audioURL);
-audio.play().catch((error) => {
-    console.error('Playback error:', error);
-});
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
