@@ -142,7 +142,7 @@ const HomePage = () => {
  const startRecording = () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream) => {
-                const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp3' }); // Test with webm/opus
+                const mediaRecorder = new MediaRecorder(stream,); // Test with webm/opus
                 mediaRecorderRef.current = mediaRecorder;
                 mediaRecorder.start();
                 setRecording(true);
@@ -349,18 +349,18 @@ const HomePage = () => {
                         <div className="audio-section">
                             {recording ? (
                                 <button onClick={stopRecording}>
-                                    <FontAwesomeIcon icon={faStop} /> Stop Recording
+                                    <FontAwesomeIcon icon={faStop} /> Stop 
                                 </button>
                             ) : (
                                 <button onClick={startRecording}>
-                                    <FontAwesomeIcon icon={faMicrophone} /> Record Audio
+                                    <FontAwesomeIcon icon={faMicrophone} /> Record 
                                 </button>
                             )}
 
                             {audioURL && (
                                 <>
                                     <audio controls src={audioURL}></audio>
-                                    <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>Upload Audio</button>
+                                    <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>Upload</button>
                                 </>
                             )}
 
