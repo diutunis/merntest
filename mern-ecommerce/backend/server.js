@@ -5,8 +5,6 @@ const dotenv = require('dotenv');
 const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
 const Drawing = require('./models/Drawing'); // Correcting the path to the model
-const drawingRoutes = require('./routes/drawingRoutes');
-app.use('/api', drawingRoutes); // Ensure this is correctly applied
 
 // Load environment variables
 dotenv.config();
