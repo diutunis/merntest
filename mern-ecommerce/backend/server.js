@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const drawingRoutes = require('./routes/drawingRoutes');
 const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
-const Drawing = require('./models/1Drawing'); // Correcting the path to the model
+const Drawing = require('./models/Drawing'); // Correcting the path to the model
 
 
 

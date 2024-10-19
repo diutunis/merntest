@@ -1,5 +1,5 @@
 const express = require('express');
-const Drawing = require('../models/1Drawing'); // Adjust path as necessary
+const Drawing = require('../models/Drawing'); // Adjust path as necessary
 const multer = require('multer');
 const router = express.Router();
 
