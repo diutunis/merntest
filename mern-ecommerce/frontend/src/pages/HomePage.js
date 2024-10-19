@@ -150,27 +150,29 @@ const HomePage = () => {
 
 
 
- const startRecording = () => {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then((stream) => {
-                const mediaRecorder = new MediaRecorder(stream,); // Test with webm/opus
-                mediaRecorderRef.current = mediaRecorder;
-                mediaRecorder.start();
-                setRecording(true);
+const startRecording = () => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then((stream) => {
+            const mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'audio/webm;codecs=opus' // Use WebM with Opus codec
+            });
+            mediaRecorderRef.current = mediaRecorder;
+            mediaRecorder.start();
+            setRecording(true);
 
-                mediaRecorder.ondataavailable = (event) => {
-                    const audioBlob = new Blob([event.data], { type: 'audio/mp3' });
-                    const url = URL.createObjectURL(audioBlob);
-                    setAudioURL(url);
-                    setCurrentRecording(audioBlob);
-                };
+            mediaRecorder.ondataavailable = (event) => {
+                const audioBlob = new Blob([event.data], { type: 'audio/webm' });
+                const url = URL.createObjectURL(audioBlob);
+                setAudioURL(url);
+                setCurrentRecording(audioBlob);
+            };
 
-                mediaRecorder.onstop = () => {
-                    setRecording(false);
-                };
-            })
-            .catch((error) => console.error('Error accessing microphone:', error));
-    };
+            mediaRecorder.onstop = () => {
+                setRecording(false);
+            };
+        })
+        .catch((error) => console.error('Error accessing microphone:', error));
+};
 
     const stopRecording = () => {
         mediaRecorderRef.current?.stop();
@@ -203,20 +205,17 @@ const HomePage = () => {
 
 
 const playAudio = async (audioURL) => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        await audioContext.resume(); // iOS needs this to resume
-
-        const audio = new Audio();
-        audio.src = audioURL;
-        audio.preload = 'auto';
-        audio.playsInline = true; // Ensure it plays inline on iOS
-        audio.onloadedmetadata = () => audio.play();
-        audio.onerror = (e) => console.error('Audio playback error:', e);
+        await audioContext.resume(); // Resume the audio context (required on Safari)
+        const audio = new Audio(audioURL);
+        await audio.play();
     } catch (error) {
-        console.error('Playback issue:', error);
+        console.error('Playback error:', error);
     }
 };
+
 
 
 
@@ -399,9 +398,10 @@ const playAudio = async (audioURL) => {
 <div className="comments">
     {drawing.comments?.map((comment, index) => (
         <div key={index} className="audio-comment">
-            <button onClick={() => playAudio(comment.audioURL)}>
-                <FontAwesomeIcon icon={faPlay} /> Play Comment 
-            </button>
+            <button onClick={() => playAudio(audioURL)}>
+    <FontAwesomeIcon icon={faPlay} /> Play
+</button>
+
         </div>
     ))}
 </div>
