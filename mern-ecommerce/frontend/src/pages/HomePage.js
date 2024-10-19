@@ -360,7 +360,7 @@ const HomePage = () => {
                             {audioURL && (
                                 <>
                                     <audio controls src={audioURL}></audio>
-                                    <button onClick={() => handleAudioUpload(drawing._id)}>Upload Audio</button>
+                                    <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>Upload Audio</button>
                                 </>
                             )}
 
@@ -381,3 +381,5 @@ const HomePage = () => {
 
 
 export default HomePage;
+
+
