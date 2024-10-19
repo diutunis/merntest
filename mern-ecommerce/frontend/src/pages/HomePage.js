@@ -179,11 +179,26 @@ const HomePage = () => {
         }
     };
 
-    const playAudio = async (audioURL) => {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+const playAudio = async (audioURL) => {
+    try {
+        // Ensure the audio context is resumed within a user-initiated event
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+
         const audio = new Audio(audioURL);
-        audio.crossOrigin = 'anonymous';
-        await audio.play();
-    };
+        audio.crossOrigin = 'anonymous'; // Ensure CORS doesn’t block audio
+        audio.playsInline = true; // Important for iOS Safari
+        audio.play().catch((error) => {
+            console.error('Audio playback failed:', error);
+        });
+    } catch (error) {
+        console.error('Audio playback error:', error);
+    }
+};
+
 
     const preventScroll = (e) => {
         if (isDrawing || isJoystickActive) e.preventDefault();
