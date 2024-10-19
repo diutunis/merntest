@@ -179,7 +179,7 @@ const HomePage = () => {
         }
     };
 
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+ 
 
 let audioContext; // Declare once globally
 
