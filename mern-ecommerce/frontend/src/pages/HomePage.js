@@ -208,17 +208,9 @@ const playAudio = async (audioURL) => {
     try {
         // Safari requires calling `resume()` to unlock the audio context.
         await audioContext.resume();
-	
- 
-            const response = await fetch(url);
-            const arrayBuffer = await response.arrayBuffer();
-       
-        const source = audioContext.createBufferSource();
-        source.buffer = audioBuffer;
-        source.connect(audioContext.destination);
+
         const audio = new Audio(audioURL);
         audio.crossOrigin = 'anonymous'; // Ensure CORS doesn't block audio
-	audio.playsInline = true; // Ensure playback in iOS Safari
         await audio.play();
     } catch (error) {
         console.error('Audio playback error:', error);
