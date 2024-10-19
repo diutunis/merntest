@@ -6,6 +6,10 @@ const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
 const Drawing = require('./models/Drawing'); // Correcting the path to the model
 
+const drawingRoutes = require('./routes/drawingRoutes');
+
+
+
 // Load environment variables
 dotenv.config();
 
@@ -13,6 +17,7 @@ dotenv.config();
 const app = express();
 
 // Use middleware
+
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json({ limit: '10mb' })); // Set higher limit for large base64 strings
@@ -84,6 +89,8 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/products', productRoutes);
+app.use('/api', drawingRoutes); // Prefix "/api" applied
+
 
 // Start the server
 const PORT = process.env.PORT || 5000;
