@@ -147,7 +147,7 @@ const HomePage = () => {
             setRecording(true);
 
             mediaRecorder.ondataavailable = (event) => {
-                const audioBlob = new Blob([event.data], { type: 'audio/mpeg' });
+                const audioBlob = new Blob([event.data], { type: 'audio/wav' });
                 const url = URL.createObjectURL(audioBlob);
                 setAudioURL(url);
                 setCurrentRecording(audioBlob);
