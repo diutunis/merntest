@@ -356,7 +356,7 @@ const HomePage = () => {
                             {audioURL && (
                                 <>
                                     <audio controls src={audioURL}></audio>
-                                    <button onClick={() => uploadAudio(drawing._id)}>Upload Audio</button>
+                                    <button onClick={() => handleAudioUpload(drawing._id)}>Upload Audio</button>
                                 </>
                             )}
 
