@@ -205,12 +205,16 @@ const HomePage = () => {
 const playAudio = async (audioURL) => {
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        await audioContext.resume(); // Ensure the audio context is resumed on iOS
+        await audioContext.resume(); // iOS needs this to resume
 
-        const audio = new Audio(audioURL);
-        audio.play().catch((error) => console.error('Playback error:', error));
+        const audio = new Audio();
+        audio.src = audioURL;
+        audio.preload = 'auto';
+        audio.playsInline = true; // Ensure it plays inline on iOS
+        audio.onloadedmetadata = () => audio.play();
+        audio.onerror = (e) => console.error('Audio playback error:', e);
     } catch (error) {
-        console.error('Audio context or playback issue:', error);
+        console.error('Playback issue:', error);
     }
 };
 
