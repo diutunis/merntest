@@ -181,23 +181,30 @@ const HomePage = () => {
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+let audioContext;
+
 const playAudio = async (audioURL) => {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
     try {
-        // Ensure the audio context is resumed within a user-initiated event
         if (audioContext.state === 'suspended') {
             await audioContext.resume();
         }
 
         const audio = new Audio(audioURL);
-        audio.crossOrigin = 'anonymous'; // Ensure CORS doesn’t block audio
-        audio.playsInline = true; // Important for iOS Safari
-        audio.play().catch((error) => {
-            console.error('Audio playback failed:', error);
-        });
+        audio.crossOrigin = 'anonymous';
+        audio.playsInline = true;
+        await audio.play();
     } catch (error) {
         console.error('Audio playback error:', error);
     }
 };
+
+
 
 
     const preventScroll = (e) => {
