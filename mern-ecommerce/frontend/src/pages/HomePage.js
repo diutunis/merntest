@@ -21,6 +21,8 @@ const HomePage = () => {
     const [audioURL, setAudioURL] = useState(null);
     const mediaRecorderRef = useRef(null);
     const [currentRecording, setCurrentRecording] = useState(null);
+    const [audioContext, setAudioContext] = useState(null);
+
 
 
     const [zoom, setZoom] = useState(1);
@@ -147,7 +149,13 @@ const HomePage = () => {
 
 
 
-
+// Initialize AudioContext with user interaction
+const initializeAudioContext = () => {
+    if (!audioContext) {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        setAudioContext(context);
+    }
+};
 
 
 
@@ -205,18 +213,25 @@ const HomePage = () => {
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const playAudio = async (audioURL) => {
+    if (!audioContext) {
+        console.warn('AudioContext not initialized. Click to activate.');
+        return;
+    }
+
     try {
-        // Safari requires calling `resume()` to unlock the audio context.
-        await audioContext.resume();
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume(); // Resume context if suspended
+        }
 
         const audio = new Audio(audioURL);
-        audio.crossOrigin = 'anonymous'; // Ensure CORS doesn't block audio
+        audio.crossOrigin = 'anonymous'; // Avoid CORS issues
+        audio.playsInline = true; // Required for iOS Safari
+	audio.muted = false
         await audio.play();
     } catch (error) {
         console.error('Audio playback error:', error);
     }
 };
-
 
 const createAudioElement = (audioURL) => {
     const audio = new Audio();
@@ -408,20 +423,17 @@ const createAudioElement = (audioURL) => {
 )}
 
 <div className="comments">
-    {drawing.comments?.map((comment, index) => (
-        <div key={index} className="audio-comment">
-            <audio
-                controls
-                preload="auto"
-                crossOrigin="anonymous"
-                playsInline // Ensure compatibility with iOS Safari
-                src={comment.audioURL}
-            >
-                Your browser does not support the audio element.
-            </audio>
-        </div>
-    ))}
-</div>
+        <button onClick={initializeAudioContext}>
+            Activate Audio (Tap before playback)
+        </button>
+        {drawing.comments?.map((comment, index) => (
+            <div key={index} className="audio-comment">
+                <button onClick={() => playAudio(comment.audioURL)}>
+                    <FontAwesomeIcon icon={faPlay} /> Play Comment
+                </button>
+            </div>
+        ))}
+    </div>
 
 
 
