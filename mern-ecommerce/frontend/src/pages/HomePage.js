@@ -140,6 +140,11 @@ const HomePage = () => {
         );
     };
 
+audioContext.resume().then(() => {
+    const audio = new Audio(audioURL);
+    audio.play().catch((error) => console.error('Playback error:', error));
+});
+
 const audio = new Audio(audioURL);
 audio.play().catch((error) => {
     console.error('Playback error:', error);
