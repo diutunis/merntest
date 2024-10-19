@@ -145,6 +145,9 @@ audio.play().catch((error) => {
     console.error('Playback error:', error);
 });
 
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+const audioContext = new AudioContext();
+
  const startRecording = () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream) => {
