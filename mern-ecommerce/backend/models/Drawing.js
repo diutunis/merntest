@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const DrawingSchema = new mongoose.Schema({
+const drawingSchema = new mongoose.Schema({
     drawing: {
         type: String, // Base64 encoded string
         required: true,
