@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
+import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
