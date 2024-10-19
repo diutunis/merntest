@@ -208,7 +208,7 @@ const playAudio = async (audioURL) => {
     try {
         // Safari requires calling `resume()` to unlock the audio context.
         await audioContext.resume();
-	const response = await fetch(audioUrl);
+	
         const arrayBuffer = await response.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
         const source = audioContext.createBufferSource();
