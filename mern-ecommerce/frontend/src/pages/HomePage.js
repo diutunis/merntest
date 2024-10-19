@@ -165,28 +165,28 @@ const HomePage = () => {
         mediaRecorderRef.current?.stop();
     };
 
-    const uploadAudio = async (drawingId) => {
-        if (!currentRecording) return;
-        const formData = new FormData();
-        formData.append('audio', currentRecording);
+    const handleAudioUpload = async (drawingId, audioFile) => {
+    const formData = new FormData();
+    formData.append('audio', audioFile);
 
-        try {
-            const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`, {
-                method: 'POST',
-                body: formData,
-            });
-            const updatedDrawing = await response.json();
+    try {
+        const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`, {
+            method: 'POST',
+            body: formData,
+        });
 
-            setDrawings((prevDrawings) =>
-                prevDrawings.map((drawing) =>
-                    drawing._id === drawingId ? { ...drawing, comments: updatedDrawing.comments } : drawing
-                )
-            );
-            setAudioURL(null); // Reset audio after upload
-        } catch (error) {
-            console.error('Error uploading audio:', error);
+        if (!response.ok) {
+            const errorData = await response.text();
+            throw new Error(`Server error: ${errorData}`);
         }
-    };
+
+        const data = await response.json();
+        console.log('Audio uploaded successfully:', data);
+    } catch (error) {
+        console.error('Error uploading audio:', error);
+    }
+};
+
 
     const preventScroll = (e) => {
         if (isDrawing || isJoystickActive) {
