@@ -210,7 +210,7 @@ const initializeAudioContext = () => {
     }
 };
 
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+//const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const playAudio = async (audioURL) => {
     if (!audioContext) {
