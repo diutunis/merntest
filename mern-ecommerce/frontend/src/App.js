@@ -12,8 +12,8 @@ import AudioPlayer from './pages/AudioPlayer'; // Import the new AudioPlayer com
 import './Styles.css';
 
 const playlist = [
-  '/music/1.mp3',
   '/music/2.mp3',
+  '/music/1.mp3',
   '/music/3.mp3',
   '/music/4.mp3',
   '/music/5.mp3',
