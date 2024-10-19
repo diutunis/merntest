@@ -208,6 +208,7 @@ const playAudio = async (audioURL) => {
         await audioContext.resume(); // Ensure the audio context is resumed on iOS
 
         const audio = new Audio(audioURL);
+audio.muted = false;
         audio.play().catch((error) => console.error('Playback error:', error));
     } catch (error) {
         console.error('Audio context or playback issue:', error);
