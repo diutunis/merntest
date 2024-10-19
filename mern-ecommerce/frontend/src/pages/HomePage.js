@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
+import 'audio-context-polyfill';
 
 
 
@@ -201,19 +202,30 @@ const HomePage = () => {
     }
 };
 
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const playAudio = async (audioURL) => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const audio = new Audio(audioURL);
-
-    // Resume audio context (Safari requires this)
-    await audioContext.resume();
-    
     try {
-        await audio.play(); // Trigger playback
+        // Safari requires calling `resume()` to unlock the audio context.
+        await audioContext.resume();
+
+        const audio = new Audio(audioURL);
+        audio.crossOrigin = 'anonymous'; // Ensure CORS doesn't block audio
+        await audio.play();
     } catch (error) {
-        console.error('Playback error:', error);
+        console.error('Audio playback error:', error);
     }
+};
+
+
+const createAudioElement = (audioURL) => {
+    const audio = new Audio();
+    audio.src = audioURL;
+    audio.preload = 'auto';
+    audio.controls = true;
+    audio.crossOrigin = 'anonymous'; // Avoid CORS issues
+    audio.playsInline = true; // Essential for iOS Safari
+    return audio;
 };
 
 
