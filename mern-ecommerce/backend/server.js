@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-//const drawingRoutes = require('./routes/drawingRoutes');
+const drawingRoutes = require('./routes/drawingRoutes');
 const productRoutes = require('./routes/productRoutes');
 const bodyParser = require('body-parser');
 const Drawing = require('./models/Drawing'); // Correcting the path to the model
@@ -66,24 +66,8 @@ app.post('/api/drawings', async (req, res) => {
 });
 
 // POST route to handle "like" functionality
-app.post('/api/drawings/:id/like', async (req, res) => {
-    try {
-        const drawing = await Drawing.findById(req.params.id);
-        
-        if (!drawing) {
-            return res.status(404).json({ error: 'Drawing not found' });
-        }
-
-        // Increment the like count
-        drawing.likes = (drawing.likes || 0) + 1;
-        await drawing.save();
-
-        res.status(200).json({ likes: drawing.likes });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to like the drawing' });
-    }
-});
-
+//app.post('/api/drawings/:id/like', async (req, res) => {
+  //
 // Sample route
 app.get('/', (req, res) => {
     res.send('API is running...');
@@ -91,7 +75,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/products', productRoutes);
 
-//app.use('/api', drawingRoutes); // Prefix "/api" applied
+app.use('/api', drawingRoutes); // Prefix "/api" applied
 
 
 // Start the server

@@ -13,12 +13,7 @@ const DrawingSchema = new mongoose.Schema({
         type: Number,
         default: 0,  // Initialize likes to 0
     },
-     comments: [
-        {
-            audioURL: String,
-            createdAt: { type: Date, default: Date.now }
-        }
-    ]
+    comments: [{ audioURL: String }],
     
 });
 
