@@ -142,13 +142,13 @@ const HomePage = () => {
  const startRecording = () => {
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then((stream) => {
-                const mediaRecorder = new MediaRecorder(stream);
+                const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm; codecs=opus' }); // Test with webm/opus
                 mediaRecorderRef.current = mediaRecorder;
                 mediaRecorder.start();
                 setRecording(true);
 
                 mediaRecorder.ondataavailable = (event) => {
-                    const audioBlob = new Blob([event.data], { type: 'audio/aac' });
+                    const audioBlob = new Blob([event.data], { type: 'audio/webm' });
                     const url = URL.createObjectURL(audioBlob);
                     setAudioURL(url);
                     setCurrentRecording(audioBlob);
