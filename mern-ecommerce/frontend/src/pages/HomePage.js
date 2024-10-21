@@ -330,6 +330,7 @@ const initializeAudioContext = () => {
 ))}
 
             </div>
+ </div>
         </div>
     );
 };
