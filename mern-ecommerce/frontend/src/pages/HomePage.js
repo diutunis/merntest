@@ -313,8 +313,10 @@ const initializeAudioContext = () => {
                             </button>
                             <span>{drawing.likes || 0}</span>
                         </div>
+
+
 const CommentsSection = ({ drawing }) => {
-  return (
+ return (
     <View className="comments">
       {drawing.comments?.map((comment, index) => (
         <AudioComment key={index} audioURL={comment.audioURL} />
