@@ -1,9 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
-import 'audio-context-polyfill';
-import AudioComment from './AudioComment';
+import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 
 const HomePage = () => {
     const canvasRef = useRef(null);
@@ -14,20 +12,16 @@ const HomePage = () => {
     const [loading, setLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const pageSize = 30;
-    const [recording, setRecording] = useState(false);
-    const [audioURL, setAudioURL] = useState(null);
-    const mediaRecorderRef = useRef(null);
-    const [currentRecording, setCurrentRecording] = useState(null);
-    const [audioContext, setAudioContext] = useState(null);
 
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
 
+    // Joystick state
     const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
-    const joystickRadius = 70;
-    const [isJoystickActive, setIsJoystickActive] = useState(false);
+    const joystickRadius = 70; // Radius of the joystick circle
+    const [isJoystickActive, setIsJoystickActive] = useState(false); // Track joystick usage
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -99,6 +93,7 @@ const HomePage = () => {
         const { x, y } = getPosition(nativeEvent);
         context.lineTo(x, y);
         context.stroke();
+
         offscreenContext.lineTo(x, y);
         offscreenContext.stroke();
     };
@@ -140,21 +135,6 @@ const HomePage = () => {
         );
     };
 
-    const CommentsSection = ({ drawing }) => (
-        <div className="comments">
-            {drawing.comments?.map((comment, index) => (
-                <AudioComment key={index} audioURL={comment.audioURL} />
-            ))}
-        </div>
-    );
-
-    const initializeAudioContext = () => {
-        if (!audioContext) {
-            const context = new (window.AudioContext || window.webkitAudioContext)();
-            setAudioContext(context);
-        }
-    };
-
     const preventScroll = (e) => {
         if (isDrawing || isJoystickActive) {
             e.preventDefault();
@@ -193,6 +173,7 @@ const HomePage = () => {
         context.drawImage(offscreenCanvasRef.current, 0, 0);
     };
 
+    // Handle joystick movement
     const handleJoystickMove = (nativeEvent) => {
         const rect = nativeEvent.currentTarget.getBoundingClientRect();
         const centerX = rect.width / 2;
@@ -204,96 +185,102 @@ const HomePage = () => {
         const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
         const angle = Math.atan2(joystickY, joystickX);
 
+        // Limit joystick movement within the joystickRadius
         if (distance > joystickRadius) {
             joystickX = joystickRadius * Math.cos(angle);
             joystickY = joystickRadius * Math.sin(angle);
         }
 
         setJoystickPosition({ x: joystickX, y: joystickY });
+
+        // Update pan based on joystick position
         setPan((prevPan) => ({
             x: prevPan.x - joystickX / 10,
             y: prevPan.y - joystickY / 10,
         }));
+        
+        // Apply transformation
         applyTransformation(zoom, {
             x: pan.x - joystickX / 10,
             y: pan.y - joystickY / 10,
         });
     };
 
-    const startJoystick = () => setIsJoystickActive(true);
+    const startJoystick = () => {
+        setIsJoystickActive(true); // Mark joystick as active
+    };
+
     const stopJoystick = () => {
+        // Reset joystick position to the center
         setJoystickPosition({ x: 0, y: 0 });
-        setIsJoystickActive(false);
+        // Optionally reset pan if desired
+        // setPan({ x: 0, y: 0 }); 
+        setIsJoystickActive(false); // Mark joystick as inactive
     };
 
     return (
-     <div className="drawing-container">
-        <canvas
-            ref={canvasRef}
-            onPointerDown={startDrawing}
-            onPointerMove={draw}
-            onPointerUp={stopDrawing}
-            onPointerLeave={stopDrawing}
-            className="drawing-canvas"
-            width={500}
-            height={500}
-        />
-        
-        <div className="controls">
-            <label htmlFor="zoom">Zoom: {zoom}</label>
-            <input
-                type="range"
-                id="zoom"
-                min="0.5"
-                max="3"
-                step="0.1"
-                value={zoom}
-                onChange={handleZoomChange}
-                className="zoom-slider"
+        <div className="drawing-container">
+            <canvas
+                ref={canvasRef}
+                onPointerDown={startDrawing}
+                onPointerMove={draw}
+                onPointerUp={stopDrawing}
+                onPointerLeave={stopDrawing}
+                className="drawing-canvas"
+                width={500}
+                height={500}
             />
-
-            {/* Joystick Area */}
-            <div
-                className="joystick"
-                style={{
-                    position: 'relative',
-                    width: `${joystickRadius * 2}px`,
-                    height: `${joystickRadius * 2}px`,
-                    borderRadius: '50%',
-                    backgroundColor: 'lightgray',
-                    overflow: 'hidden',
-                }}
-                onPointerDown={startJoystick}
-                onPointerMove={handleMouseMove}
-                onPointerUp={stopJoystick}
-                onPointerLeave={stopJoystick}
-            >
-                <div
-                    className="joystick-handle"
-                    style={{
-                        position: 'absolute',
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%',
-                        backgroundColor: 'blue',
-                        transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
-                        transition: 'transform 0.1s',
-                    }}
+            <div className="controls">
+                <label htmlFor="zoom">Zoom: {zoom}</label>
+                <input
+                    type="range"
+                    id="zoom"
+                    min="0.5"
+                    max="3"
+                    step="0.1"
+                    value={zoom}
+                    onChange={handleZoomChange}
+ className="zoom-slider"
                 />
-            </div>
-        </div>
 
-        <div className="buttons">
+                {/* Joystick Area */}
+                <div
+                    className="joystick"
+                    style={{
+                        position: 'relative',
+                        width: `${joystickRadius * 2}px`,
+                        height: `${joystickRadius * 2}px`,
+                        borderRadius: '50%',
+                        backgroundColor: 'lightgray',
+                        overflow: 'hidden',
+                    }}
+                    onPointerDown={startJoystick}
+                    onPointerMove={handleMouseMove}
+                    onPointerUp={stopJoystick}
+                    onPointerLeave={stopJoystick}
+                >
+                    <div
+                        className="joystick-handle"
+                        style={{
+                            position: 'absolute',
+                            width: '30px',
+                            height: '30px',
+                            borderRadius: '50%',
+                            backgroundColor: 'blue',
+                            transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
+                            transition: 'transform 0.1s',
+                        }}
+                    />
+                </div>
+            </div>
+
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
-        </div>
 
-        <div className="posted-drawings">
-            {drawings.map((drawing) => (
-                <div key={drawing._id} className="drawing-item">
-                    <div>
-                        <CommentsSection drawing={drawing} />
-                        <img src={drawing.drawing} alt="User drawing" />
+            <div className="posted-drawings">
+                {drawings.map((drawing, index) => (
+                    <div key={drawing._id} className="drawing-item">
+                        <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
                             <button onClick={() => handleLike(drawing._id)}>
                                 <FontAwesomeIcon icon={faHandSparkles} />
@@ -301,8 +288,12 @@ const HomePage = () => {
                             <span>{drawing.likes || 0}</span>
                         </div>
                     </div>
-                </div>
-    )
+                ))}
+            </div>
+
+            {loading && <h4>Loading...</h4>}
+        </div>
+    );
 };
 
 export default HomePage;
