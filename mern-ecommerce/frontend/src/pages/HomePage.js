@@ -314,7 +314,7 @@ const initializeAudioContext = () => {
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
 
-            {drawings.map((drawing) => (
+         {drawings.map((drawing) => (
     <div key={drawing._id} className="drawing-item">
         <div>
             <CommentsSection drawing={drawing} />
