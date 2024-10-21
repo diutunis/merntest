@@ -256,84 +256,84 @@ const initializeAudioContext = () => {
     };
 
     return (
-        <div className="drawing-container">
-            <canvas
-                ref={canvasRef}
-                onPointerDown={startDrawing}
-                onPointerMove={draw}
-                onPointerUp={stopDrawing}
-                onPointerLeave={stopDrawing}
-                className="drawing-canvas"
-                width={500}
-                height={500}
+    <div className="drawing-container">
+        <canvas
+            ref={canvasRef}
+            onPointerDown={startDrawing}
+            onPointerMove={draw}
+            onPointerUp={stopDrawing}
+            onPointerLeave={stopDrawing}
+            className="drawing-canvas"
+            width={500}
+            height={500}
+        />
+        
+        <div className="controls">
+            <label htmlFor="zoom">Zoom: {zoom}</label>
+            <input
+                type="range"
+                id="zoom"
+                min="0.5"
+                max="3"
+                step="0.1"
+                value={zoom}
+                onChange={handleZoomChange}
+                className="zoom-slider"
             />
-            <div className="controls">
-                <label htmlFor="zoom">Zoom: {zoom}</label>
-                <input
-                    type="range"
-                    id="zoom"
-                    min="0.5"
-                    max="3"
-                    step="0.1"
-                    value={zoom}
-                    onChange={handleZoomChange}
- className="zoom-slider"
-                />
 
-                {/* Joystick Area */}
+            {/* Joystick Area */}
+            <div
+                className="joystick"
+                style={{
+                    position: 'relative',
+                    width: `${joystickRadius * 2}px`,
+                    height: `${joystickRadius * 2}px`,
+                    borderRadius: '50%',
+                    backgroundColor: 'lightgray',
+                    overflow: 'hidden',
+                }}
+                onPointerDown={startJoystick}
+                onPointerMove={handleMouseMove}
+                onPointerUp={stopJoystick}
+                onPointerLeave={stopJoystick}
+            >
                 <div
-                    className="joystick"
+                    className="joystick-handle"
                     style={{
-                        position: 'relative',
-                        width: `${joystickRadius * 2}px`,
-                        height: `${joystickRadius * 2}px`,
+                        position: 'absolute',
+                        width: '30px',
+                        height: '30px',
                         borderRadius: '50%',
-                        backgroundColor: 'lightgray',
-                        overflow: 'hidden',
+                        backgroundColor: 'blue',
+                        transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
+                        transition: 'transform 0.1s',
                     }}
-                    onPointerDown={startJoystick}
-                    onPointerMove={handleMouseMove}
-                    onPointerUp={stopJoystick}
-                    onPointerLeave={stopJoystick}
-                >
-                    <div
-                        className="joystick-handle"
-                        style={{
-                            position: 'absolute',
-                            width: '30px',
-                            height: '30px',
-                            borderRadius: '50%',
-                            backgroundColor: 'blue',
-                            transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
-                            transition: 'transform 0.1s',
-                        }}
-                    />
-                </div>
+                />
             </div>
+        </div>
 
+        <div className="buttons">
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
+        </div>
 
-         {drawings.map((drawing) => (
-    <div key={drawing._id} className="drawing-item">
-        <div>
-            <CommentsSection drawing={drawing} />
-            <img src={drawing.drawing} alt="User drawing" />
-            <div className="like-section">
-                <button onClick={() => handleLike(drawing._id)}>
-                    <FontAwesomeIcon icon={faHandSparkles} />
-                </button>
-                <span>{drawing.likes || 0}</span>
-            </div>
+        <div className="posted-drawings">
+            {drawings.map((drawing) => (
+                <div key={drawing._id} className="drawing-item">
+                    <div>
+                        <CommentsSection drawing={drawing} />
+                        <img src={drawing.drawing} alt="User drawing" />
+                        <div className="like-section">
+                            <button onClick={() => handleLike(drawing._id)}>
+                                <FontAwesomeIcon icon={faHandSparkles} />
+                            </button>
+                            <span>{drawing.likes || 0}</span>
+                        </div>
+                    </div>
+                </div>
+            ))}
         </div>
     </div>
-))}
-
-            </div>
- </div>
-        </div>
-    );
-};
-
+);
 
 export default HomePage;
