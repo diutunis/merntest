@@ -314,28 +314,21 @@ const initializeAudioContext = () => {
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
 
-            <div className="posted-drawings">
-                {drawings.map((drawing) => (
-                    <div key={drawing._id} className="drawing-item">
-<CommentsSection drawing={drawing} />
+            {drawings.map((drawing) => (
+    <div key={drawing._id} className="drawing-item">
+        <div>
+            <CommentsSection drawing={drawing} />
+            <img src={drawing.drawing} alt="User drawing" />
+            <div className="like-section">
+                <button onClick={() => handleLike(drawing._id)}>
+                    <FontAwesomeIcon icon={faHandSparkles} />
+                </button>
+                <span>{drawing.likes || 0}</span>
+            </div>
+        </div>
+    </div>
+))}
 
-                        <img src={drawing.drawing} alt="User drawing" />
-                        <div className="like-section">
-                            <button onClick={() => handleLike(drawing._id)}>
-                                <FontAwesomeIcon icon={faHandSparkles} />
-                            </button>
-                            <span>{drawing.likes || 0}</span>
-                        </div>
-
-
-
-
-
-
-
-                        </div>
-                    </div>
-                ))}
             </div>
         </div>
     );
