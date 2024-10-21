@@ -3,7 +3,7 @@ import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import 'audio-context-polyfill';
-
+import '.AudioComment.js';
 
 
 
