@@ -159,92 +159,7 @@ const initializeAudioContext = () => {
 
 
 
- const startRecording = () => {
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then((stream) => {
-                const mediaRecorder = new MediaRecorder(stream,); // Test with webm/opus
-                mediaRecorderRef.current = mediaRecorder;
-                mediaRecorder.start();
-                setRecording(true);
-
-                mediaRecorder.ondataavailable = (event) => {
-                    const audioBlob = new Blob([event.data], { type: 'audio/mpeg' });
-                    const url = URL.createObjectURL(audioBlob);
-                    setAudioURL(url);
-                    setCurrentRecording(audioBlob);
-                };
-
-                mediaRecorder.onstop = () => {
-                    setRecording(false);
-                };
-            })
-            .catch((error) => console.error('Error accessing microphone:', error));
-    };
-
-    const stopRecording = () => {
-        mediaRecorderRef.current?.stop();
-    };
-
-   const handleAudioUpload = async (drawingId, audioFile) => {
-    const formData = new FormData();
-    formData.append('audio', audioFile);
-
-    try {
-        const response = await fetch(
-            `https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`,
-            {
-                method: 'POST',
-                body: formData,
-            }
-        );
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Server error: ${errorText}`);
-        }
-
-        const data = await response.json();
-        console.log('Audio uploaded successfully:', data);
-    } catch (error) {
-        console.error('Error uploading audio:', error);
-    }
-};
-
-//const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-const playAudio = async (audioURL) => {
-    if (!audioContext) {
-        console.warn('AudioContext not initialized. Click to activate.');
-        return;
-    }
-
-    try {
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume(); // Resume context if suspended
-        }
-
-        const audio = new Audio(audioURL);
-        audio.crossOrigin = 'anonymous'; // Avoid CORS issues
-        audio.playsInline = true; // Required for iOS Safari
-	audio.muted = false
-        await audio.play();
-    } catch (error) {
-        console.error('Audio playback error:', error);
-    }
-};
-
-const createAudioElement = (audioURL) => {
-    const audio = new Audio();
-    audio.src = audioURL;
-    audio.preload = 'auto';
-    audio.controls = true;
-    audio.crossOrigin = 'anonymous'; // Avoid CORS issues
-    audio.playsInline = true; // Essential for iOS Safari
-    return audio;
-};
-
-
-
+ 
 
     const preventScroll = (e) => {
         if (isDrawing || isJoystickActive) {
@@ -398,42 +313,17 @@ const createAudioElement = (audioURL) => {
                             </button>
                             <span>{drawing.likes || 0}</span>
                         </div>
+const CommentsSection = ({ drawing }) => {
+  return (
+    <View className="comments">
+      {drawing.comments?.map((comment, index) => (
+        <AudioComment key={index} audioURL={comment.audioURL} />
+      ))}
+    </View>
+  );
+};
 
-                        {/* Audio Recording and Playback Section */}
-                        <div className="audio-section">
-                            {recording ? (
-                                <button onClick={stopRecording}>
-                                    <FontAwesomeIcon icon={faStop} /> Stop 
-                                </button>
-                            ) : (
-                                <button onClick={startRecording}>
-                                    <FontAwesomeIcon icon={faMicrophone} /> Record 
-                                </button>
-                            )}
-
-                           {audioURL && (
-    <>
-        <button onClick={() => playAudio(audioURL)}>
-            <FontAwesomeIcon icon={faPlay} /> Play 
-        </button>
-        <button onClick={() => handleAudioUpload(drawing._id, currentRecording)}>
-            Upload
-        </button>
-    </>
-)}
-
-<div className="comments">
-        <button onClick={initializeAudioContext}>
-            Activate Audio (Tap before playback)
-        </button>
-        {drawing.comments?.map((comment, index) => (
-            <div key={index} className="audio-comment">
-                <button onClick={() => playAudio(comment.audioURL)}>
-                    <FontAwesomeIcon icon={faPlay} /> Play Comment
-                </button>
-            </div>
-        ))}
-    </div>
+      
 
 
 
