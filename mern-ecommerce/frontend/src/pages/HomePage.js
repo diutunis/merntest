@@ -5,10 +5,6 @@ import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-
 import 'audio-context-polyfill';
 import AudioComment from './AudioComment';
 
-
-
-
-
 const HomePage = () => {
     const canvasRef = useRef(null);
     const offscreenCanvasRef = useRef(null);
@@ -24,17 +20,14 @@ const HomePage = () => {
     const [currentRecording, setCurrentRecording] = useState(null);
     const [audioContext, setAudioContext] = useState(null);
 
-
-
     const [zoom, setZoom] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
 
-    // Joystick state
     const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
-    const joystickRadius = 70; // Radius of the joystick circle
-    const [isJoystickActive, setIsJoystickActive] = useState(false); // Track joystick usage
+    const joystickRadius = 70;
+    const [isJoystickActive, setIsJoystickActive] = useState(false);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -106,7 +99,6 @@ const HomePage = () => {
         const { x, y } = getPosition(nativeEvent);
         context.lineTo(x, y);
         context.stroke();
-
         offscreenContext.lineTo(x, y);
         offscreenContext.stroke();
     };
@@ -149,28 +141,19 @@ const HomePage = () => {
     };
 
     const CommentsSection = ({ drawing }) => (
-    <div className="comments">
-      {drawing.comments?.map((comment, index) => (
-        <AudioComment key={index} audioURL={comment.audioURL} />
-      ))}
-    </div>
-);
+        <div className="comments">
+            {drawing.comments?.map((comment, index) => (
+                <AudioComment key={index} audioURL={comment.audioURL} />
+            ))}
+        </div>
+    );
 
-
-
-
-
-// Initialize AudioContext with user interaction
-const initializeAudioContext = () => {
-    if (!audioContext) {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        setAudioContext(context);
-    }
-};
-
-
-
- 
+    const initializeAudioContext = () => {
+        if (!audioContext) {
+            const context = new (window.AudioContext || window.webkitAudioContext)();
+            setAudioContext(context);
+        }
+    };
 
     const preventScroll = (e) => {
         if (isDrawing || isJoystickActive) {
@@ -210,7 +193,6 @@ const initializeAudioContext = () => {
         context.drawImage(offscreenCanvasRef.current, 0, 0);
     };
 
-    // Handle joystick movement
     const handleJoystickMove = (nativeEvent) => {
         const rect = nativeEvent.currentTarget.getBoundingClientRect();
         const centerX = rect.width / 2;
@@ -222,41 +204,30 @@ const initializeAudioContext = () => {
         const distance = Math.sqrt(joystickX ** 2 + joystickY ** 2);
         const angle = Math.atan2(joystickY, joystickX);
 
-        // Limit joystick movement within the joystickRadius
         if (distance > joystickRadius) {
             joystickX = joystickRadius * Math.cos(angle);
             joystickY = joystickRadius * Math.sin(angle);
         }
 
         setJoystickPosition({ x: joystickX, y: joystickY });
-
-        // Update pan based on joystick position
         setPan((prevPan) => ({
             x: prevPan.x - joystickX / 10,
             y: prevPan.y - joystickY / 10,
         }));
-        
-        // Apply transformation
         applyTransformation(zoom, {
             x: pan.x - joystickX / 10,
             y: pan.y - joystickY / 10,
         });
     };
 
-    const startJoystick = () => {
-        setIsJoystickActive(true); // Mark joystick as active
-    };
-
+    const startJoystick = () => setIsJoystickActive(true);
     const stopJoystick = () => {
-        // Reset joystick position to the center
         setJoystickPosition({ x: 0, y: 0 });
-        // Optionally reset pan if desired
-        // setPan({ x: 0, y: 0 }); 
-        setIsJoystickActive(false); // Mark joystick as inactive
+        setIsJoystickActive(false);
     };
 
     return (
-    <div className="drawing-container">
+     <div className="drawing-container">
         <canvas
             ref={canvasRef}
             onPointerDown={startDrawing}
@@ -331,9 +302,7 @@ const initializeAudioContext = () => {
                         </div>
                     </div>
                 </div>
-            ))}
-        </div>
-    </div>
-);
+    );
+};
 
 export default HomePage;
