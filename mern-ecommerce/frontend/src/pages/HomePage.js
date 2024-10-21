@@ -314,7 +314,7 @@ const initializeAudioContext = () => {
                             <span>{drawing.likes || 0}</span>
                         </div>
 
-
+<div className="comments-sections">
 const CommentsSection = ({ drawing }) => {
  return (
     <View className="comments">
@@ -324,7 +324,7 @@ const CommentsSection = ({ drawing }) => {
     </View>
   );
 };
-
+  </div>
       
 
 
