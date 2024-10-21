@@ -3,7 +3,8 @@ import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles, faMicrophone, faPlay, faStop } from '@fortawesome/free-solid-svg-icons';
 import 'audio-context-polyfill';
-import '.AudioComment.js';
+import AudioComment from './AudioComment';
+
 
 
 
@@ -146,6 +147,16 @@ const HomePage = () => {
             )
         );
     };
+
+    const CommentsSection = ({ drawing }) => (
+    <div className="comments">
+      {drawing.comments?.map((comment, index) => (
+        <AudioComment key={index} audioURL={comment.audioURL} />
+      ))}
+    </div>
+);
+
+
 
 
 
@@ -306,6 +317,8 @@ const initializeAudioContext = () => {
             <div className="posted-drawings">
                 {drawings.map((drawing) => (
                     <div key={drawing._id} className="drawing-item">
+<CommentsSection drawing={drawing} />
+
                         <img src={drawing.drawing} alt="User drawing" />
                         <div className="like-section">
                             <button onClick={() => handleLike(drawing._id)}>
@@ -314,18 +327,7 @@ const initializeAudioContext = () => {
                             <span>{drawing.likes || 0}</span>
                         </div>
 
-<div className="comments-sections">
-const CommentsSection = ({ drawing }) => {
- return (
-    <View className="comments">
-      {drawing.comments?.map((comment, index) => (
-        <AudioComment key={index} audioURL={comment.audioURL} />
-      ))}
-    </View>
-  );
-};
-  </div>
-      
+
 
 
 
