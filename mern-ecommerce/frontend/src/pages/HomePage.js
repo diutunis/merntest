@@ -101,7 +101,7 @@ const HomePage = () => {
                     step="0.1"
                     value={zoom}
                     onChange={handleZoomChange}
- className="zoom-slider"
+                    className="zoom-slider"
                 />
 
                 {/* Joystick Area */}
@@ -109,8 +109,8 @@ const HomePage = () => {
                     className="joystick"
                     style={{
                         position: 'relative',
-                        width: ${joystickRadius * 2}px,
-                        height: ${joystickRadius * 2}px,
+                        width: `${joystickRadius * 2}px`,
+                        height: `${joystickRadius * 2}px`,
                         borderRadius: '50%',
                         backgroundColor: 'lightgray',
                         overflow: 'hidden',
@@ -128,7 +128,7 @@ const HomePage = () => {
                             height: '30px',
                             borderRadius: '50%',
                             backgroundColor: 'blue',
-                            transform: translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px),
+                            transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
                             transition: 'transform 0.1s',
                         }}
                     />
