@@ -31,6 +31,26 @@ const HomePage = () => {
 
 
 /////////////////////////////////////////////////////////////
+
+ const handleAudioUpload = async (audioBlob, drawingId) => {
+        const formData = new FormData();
+        formData.append('audio', audioBlob);
+
+        try {
+            const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`, {
+                method: 'POST',
+                body: formData,
+            });
+            const savedComment = await response.json();
+            setDrawings((prevDrawings) =>
+                prevDrawings.map((drawing) =>
+                    drawing._id === drawingId ? { ...drawing, comments: [...drawing.comments, savedComment] } : drawing
+                )
+            );
+        } catch (error) {
+            console.error('Error uploading audio comment:', error);
+        }
+
 ///////////////////////////////////////////////////////////////
 
 
@@ -290,7 +310,7 @@ const HomePage = () => {
                             height: '30px',
                             borderRadius: '50%',
                             backgroundColor: 'blue',
-                            transform: translate('${joystickPosition.x + joystickRadius - 15}px', '${joystickPosition.y + joystickRadius - 15}px'),
+                            transform: 'translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)',
                             transition: 'transform 0.1s',
                         }}
                     />
