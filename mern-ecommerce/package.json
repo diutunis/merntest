@@ -23,6 +23,7 @@
     "mongoose": "^8.6.3",
     "multer": "^1.4.5-lts.1",
     "pdfjs-dist": "^3.11.174",
+    "react": "^18.3.1",
     "react-media-recorder": "^1.7.1",
     "react-native-audio-recorder-player": "^3.6.12"
   }
