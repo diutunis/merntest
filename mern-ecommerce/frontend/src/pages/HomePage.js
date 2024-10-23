@@ -23,62 +23,9 @@ const HomePage = () => {
     const [audioURL, setAudioURL] = useState(null);
     const [currentAudioComment, setCurrentAudioComment] = useState(null); // To save the audio comment for each drawing
 
-    useEffect(() => {
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        setContext(ctx);
+    
 
-        const offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = canvas.width;
-        offscreenCanvas.height = canvas.height;
-        const offscreenCtx = offscreenCanvas.getContext('2d');
-        offscreenCanvasRef.current = offscreenCanvas;
-        setOffscreenContext(offscreenCtx);
-    }, []);
-
-    const fetchDrawings = async () => {
-        if (loading || !hasMore) return;
-        setLoading(true);
-        try {
-            const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize}`);
-            const data = await response.json();
-
-            let newDrawings = Array.isArray(data) ? data : data.drawings || [];
-            setDrawings((prevDrawings) => [...prevDrawings, ...newDrawings]);
-
-            if (newDrawings.length < pageSize) {
-                setHasMore(false);
-            }
-        } catch (error) {
-            console.error('Error fetching drawings:', error);
-        }
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchDrawings();
-    }, [page]);
-
-    const handleAudioUpload = async (audioBlob, drawingId) => {
-        const formData = new FormData();
-        formData.append('audio', audioBlob);
-
-        try {
-            const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`, {
-                method: 'POST',
-                body: formData,
-            });
-            const savedComment = await response.json();
-            setDrawings((prevDrawings) =>
-                prevDrawings.map((drawing) =>
-                    drawing._id === drawingId ? { ...drawing, comments: [...drawing.comments, savedComment] } : drawing
-                )
-            );
-        } catch (error) {
-            console.error('Error uploading audio comment:', error);
-        }
-    };
-
+    
 
 
 
