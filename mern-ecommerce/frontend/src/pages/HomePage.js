@@ -49,7 +49,7 @@ const HomePage = () => {
             );
         } catch (error) {
             console.error('Error uploading audio comment:', error);
-        }
+        }}
 
 ///////////////////////////////////////////////////////////////
 
