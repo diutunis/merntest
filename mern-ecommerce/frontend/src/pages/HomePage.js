@@ -19,7 +19,6 @@ const HomePage = () => {
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
 
-
     const [isRecording, setIsRecording] = useState(false);
     const [audioURL, setAudioURL] = useState(null);
     const [currentAudioComment, setCurrentAudioComment] = useState(null); // To save the audio comment for each drawing
@@ -46,7 +45,7 @@ const HomePage = () => {
         if (loading || !hasMore) return;
         setLoading(true);
         try {
-            const response = await fetch(https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize});
+            const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize}`);
             const data = await response.json();
 
             let newDrawings = Array.isArray(data) ? data : data.drawings || [];
@@ -65,8 +64,7 @@ const HomePage = () => {
         fetchDrawings();
     }, [page]);
 
-
-  const handleAudioUpload = async (audioBlob, drawingId) => {
+    const handleAudioUpload = async (audioBlob, drawingId) => {
         const formData = new FormData();
         formData.append('audio', audioBlob);
 
@@ -85,7 +83,6 @@ const HomePage = () => {
             console.error('Error uploading audio comment:', error);
         }
     };
-
 
     const handleScroll = () => {
         if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100 && !loading) {
@@ -152,7 +149,7 @@ const HomePage = () => {
     };
 
     const handleLike = async (drawingId) => {
-        const response = await fetch(https://merntest-1.onrender.com/api/drawings/${drawingId}/like, {
+        const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/like`, {
             method: 'POST',
         });
         const updatedDrawing = await response.json();
@@ -222,125 +219,86 @@ const HomePage = () => {
         setJoystickPosition({ x: joystickX, y: joystickY });
 
         // Update pan based on joystick position
+        const panSpeed = 2; // Adjust for desired panning sensitivity
         setPan((prevPan) => ({
-            x: prevPan.x - joystickX / 10,
-            y: prevPan.y - joystickY / 10,
+            x: prevPan.x - joystickX * panSpeed,
+            y: prevPan.y - joystickY * panSpeed,
         }));
-        
-        // Apply transformation
-        applyTransformation(zoom, {
-            x: pan.x - joystickX / 10,
-            y: pan.y - joystickY / 10,
-        });
+        applyTransformation(zoom, { x: pan.x - joystickX * panSpeed, y: pan.y - joystickY * panSpeed });
     };
 
-    const startJoystick = () => {
-        setIsJoystickActive(true); // Mark joystick as active
-    };
-
-    const stopJoystick = () => {
-        // Reset joystick position to the center
-        setJoystickPosition({ x: 0, y: 0 });
-        // Optionally reset pan if desired
-        // setPan({ x: 0, y: 0 }); 
-        setIsJoystickActive(false); // Mark joystick as inactive
+    const handleJoystickRelease = () => {
+        setIsJoystickActive(false);
+        setJoystickPosition({ x: 0, y: 0 }); // Reset joystick to center
     };
 
     return (
-        <div className="drawing-container">
-            <canvas
-                ref={canvasRef}
-                onPointerDown={startDrawing}
-                onPointerMove={draw}
-                onPointerUp={stopDrawing}
-                onPointerLeave={stopDrawing}
-                className="drawing-canvas"
-                width={500}
-                height={500}
-            />
-            <div className="controls">
-                <label htmlFor="zoom">Zoom: {zoom}</label>
-                <input
-                    type="range"
-                    id="zoom"
-                    min="0.5"
-                    max="3"
-                    step="0.1"
-                    value={zoom}
-                    onChange={handleZoomChange}
- className="zoom-slider"
+        <div>
+            <h1></h1>
+            <div className="canvas-container">
+                <canvas
+                    ref={canvasRef}
+                    width="800"
+                    height="600"
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
                 />
-
-                {/* Joystick Area */}
                 <div
-                    className="joystick"
-                    style={{
-                        position: 'relative',
-                        width: ${joystickRadius * 2}px,
-                        height: ${joystickRadius * 2}px,
-                        borderRadius: '50%',
-                        backgroundColor: 'lightgray',
-                        overflow: 'hidden',
-                    }}
-                    onPointerDown={startJoystick}
-                    onPointerMove={handleMouseMove}
-                    onPointerUp={stopJoystick}
-                    onPointerLeave={stopJoystick}
+                    className="joystick-container"
+                    onMouseDown={() => setIsJoystickActive(true)}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleJoystickRelease}
+                    onMouseLeave={handleJoystickRelease}
                 >
                     <div
                         className="joystick-handle"
                         style={{
-                            position: 'absolute',
-                            width: '30px',
-                            height: '30px',
-                            borderRadius: '50%',
-                            backgroundColor: 'blue',
-                            transform: translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px),
-                            transition: 'transform 0.1s',
+                            transform: `translate(${joystickPosition.x}px, ${joystickPosition.y}px)`,
                         }}
                     />
                 </div>
             </div>
-
-            <button onClick={saveDrawing}>Post</button>
-            <button onClick={clearCanvas}>Clear</button>
-
-            <div className="posted-drawings">
-                {drawings.map((drawing, index) => (
+            <button onClick={saveDrawing}>Save Drawing</button>
+            <div className="zoom-controls">
+                <label>Zoom: </label>
+                <input type="range" min="0.5" max="2" step="0.1" value={zoom} onChange={handleZoomChange} />
+            </div>
+            <div className="drawing-gallery">
+                {drawings.map((drawing) => (
                     <div key={drawing._id} className="drawing-item">
-                        <img src={drawing.drawing} alt={User drawing ${index + 1}} />
-                        <div className="like-section">
-                            <button onClick={() => handleLike(drawing._id)}>
-                                <FontAwesomeIcon icon={faHandSparkles} />
-                            </button>
-                            <span>{drawing.likes || 0}</span>
-                        </div>
+                        <img src={drawing.image} alt="Drawing" />
+                        <button onClick={() => handleLike(drawing._id)}>
+                            <FontAwesomeIcon icon={faHandSparkles} /> {drawing.likes}
+                        </button>
+                        <ReactMediaRecorder
+                            audio
+                            render={({ startRecording, stopRecording, mediaBlobUrl }) => (
+                                <div className="audio-recorder">
+                                    <button onClick={startRecording}><FontAwesomeIcon icon={faMicrophone} /></button>
+                                    <button onClick={stopRecording}><FontAwesomeIcon icon={faStop} /></button>
+                                    {mediaBlobUrl && (
+                                        <button
+                                            onClick={() => {
+                                                handleAudioUpload(mediaBlobUrl, drawing._id);
+                                            }}
+                                        >
+                                            <FontAwesomeIcon icon={faUpload} />
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        />
+                        {drawing.comments.map((comment, index) => (
+                            <audio key={index} src={comment.audioURL} controls />
+                        ))}
                     </div>
                 ))}
             </div>
- {/* Audio Recorder */}
-                        <div className="audio-recorder">
-                            <ReactMediaRecorder
-                                audio
-                                render={({ startRecording, stopRecording, mediaBlobUrl }) => (
-                                    <div>
-                                        <button onClick={startRecording}>
-                                            <FontAwesomeIcon icon={faMicrophone} /> Start Recording
-                                        </button>
-                                        <button onClick={stopRecording}>
-                                            <FontAwesomeIcon icon={faStop} /> Stop Recording
-                                        </button>
-                                        {mediaBlobUrl && (
-                                            <div>
-                                                <audio src={mediaBlobUrl} controls />
-                                                <button
-                                                    onClick={() => handleAudioUpload(mediaBlobUrl, drawing._id)}
-                                                >
-                                                    <FontAwesomeIcon icon={faUpload} /> Upload
-                                                </button>
-                                            </div>
-
-            {loading && <h4>Loading...</h4>}
         </div>
     );
 };
