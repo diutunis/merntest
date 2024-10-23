@@ -128,7 +128,7 @@ const HomePage = () => {
                             height: '30px',
                             borderRadius: '50%',
                             backgroundColor: 'blue',
-                            transform: translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px),
+                            transform: translate('${joystickPosition.x + joystickRadius - 15}px', '${joystickPosition.y + joystickRadius - 15}px'),
                             transition: 'transform 0.1s',
                         }}
                     />
