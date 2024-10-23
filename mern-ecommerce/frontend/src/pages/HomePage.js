@@ -56,7 +56,7 @@ const HomePage = () => {
         if (loading || !hasMore) return;
         setLoading(true);
         try {
-            const response = await fetch(https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize});
+            const response = await fetch('https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize}');
             const data = await response.json();
 
             let newDrawings = Array.isArray(data) ? data : data.drawings || [];
@@ -140,7 +140,7 @@ const HomePage = () => {
     };
 
     const handleLike = async (drawingId) => {
-        const response = await fetch(https://merntest-1.onrender.com/api/drawings/${drawingId}/like, {
+        const response = await fetch('https://merntest-1.onrender.com/api/drawings/${drawingId}/like', {
             method: 'POST',
         });
         const updatedDrawing = await response.json();
