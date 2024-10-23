@@ -309,42 +309,51 @@ const saveAudioComment = async (drawingId, mediaBlobUrl) => {
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
 
-            <div className="posted-drawing">
-  <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
-  <div className="like-section">
-    <button onClick={() => handleLike(drawing._id)}>
-      <FontAwesomeIcon icon={faHandSparkles} />
-    </button>
-    <span>{drawing.likes || 0}</span>
-  </div>
+<div className="posted-drawings">
+  {drawings.map((drawing, index) => (
+    <div key={drawing._id} className="drawing-item">
+      <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
+      <div className="like-section">
+        <button onClick={() => handleLike(drawing._id)}>
+          <FontAwesomeIcon icon={faHandSparkles} />
+        </button>
+        <span>{drawing.likes || 0}</span>
+      </div>
 
-  {/* Audio Comment Section */}
-  <div className="audio-comment-section">
-    <ReactMediaRecorder
-      audio
-      render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
-        <>
-          <p>{status}</p>
-          <button onClick={startRecording}>Start Recording</button>
-          <button onClick={stopRecording}>Stop Recording</button>
-          <audio src={mediaBlobUrl} controls />
-          {mediaBlobUrl && <button onClick={() => saveAudioComment(drawing._id, mediaBlobUrl)}>Post Audio Comment</button>}
-        </>
-      )}
-    />
-    
-    {/* Display audio comments */}
-    <div className="audio-comments">
-      {drawing.comments?.map((comment, i) => (
-        comment.type === 'audio' && (
-          <div key={i}>
-            <audio src={comment.audioUrl} controls />
-          </div>
-        )
-      ))}
+      {/* Audio Comment Section */}
+      <div className="audio-comment-section">
+        <ReactMediaRecorder
+          audio
+          render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
+            <>
+              <p>{status}</p>
+              <button onClick={startRecording}>Start Recording</button>
+              <button onClick={stopRecording}>Stop Recording</button>
+              <audio src={mediaBlobUrl} controls />
+              {mediaBlobUrl && (
+                <button onClick={() => saveAudioComment(drawing._id, mediaBlobUrl)}>
+                  Post Audio Comment
+                </button>
+              )}
+            </>
+          )}
+        />
+        
+        {/* Display audio comments */}
+        <div className="audio-comments">
+          {drawing.comments?.map((comment, i) => (
+            comment.type === 'audio' && (
+              <div key={i}>
+                <audio src={comment.audioUrl} controls />
+              </div>
+            )
+          ))}
+        </div>
+      </div>
     </div>
-  </div>
+  ))}
 </div>
+
 
 
             {loading && <h4>Loading...</h4>}
