@@ -225,10 +225,9 @@ const HomePage = () => {
     };
 
 
-const saveAudioComment = async (drawingId, mediaBlobUrl) => {
-    const blob = await fetch(mediaBlobUrl).then((r) => r.blob());
+const saveAudioComment = async (drawingId, audioBlob) => {
     const formData = new FormData();
-    formData.append('audio', blob);
+    formData.append('audio', audioBlob);
     
     try {
         const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/comments`, {
@@ -321,35 +320,22 @@ const saveAudioComment = async (drawingId, mediaBlobUrl) => {
                         </div>
 
                         {/* Audio Comment Section */}
-                        <div className="audio-comment-section">
-                            <ReactMediaRecorder
-                                audio
-                                render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
-                                    <>
-                                        <p>{status}</p>
-                                        <button onClick={startRecording}>Start Recording</button>
-                                        <button onClick={stopRecording}>Stop Recording</button>
-                                        <audio src={mediaBlobUrl} controls />
-                                        {mediaBlobUrl && (
-                                            <button onClick={() => saveAudioComment(drawing._id, mediaBlobUrl)}>
-                                                Post Audio Comment
-                                            </button>
-                                        )}
-                                    </>
-                                )}
-                            />
-
-                            {/* Display audio comments */}
-                            <div className="audio-comments">
-                                {drawing.comments?.map((comment, i) => (
-                                    comment.type === 'audio' && (
-                                        <div key={i}>
-                                            <audio src={comment.audioUrl} controls />
-                                        </div>
-                                    )
-                                ))}
-                            </div>
-                        </div>
+                       <div className="audio-comment-section">
+    <AudioRecorder 
+        drawingId={drawing._id}
+        onSave={saveAudioComment}
+    />
+    
+    <div className="audio-comments">
+        {drawing.comments?.map((comment, i) => (
+            comment.type === 'audio' && (
+                <div key={i}>
+                    <audio src={comment.audioUrl} controls />
+                </div>
+            )
+        ))}
+    </div>
+</div>
                     </div>
                 ))}
             </div>
