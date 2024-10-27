@@ -3,7 +3,7 @@ import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
 import { ReactMediaRecorder } from 'react-media-recorder';
-import { AudioRecorder} from './AudioRecorder.js';
+import  AudioRecorder from './AudioRecorder.js';
 
 
 
