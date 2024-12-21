@@ -109,12 +109,6 @@ const HomePage = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [loading]);
 
-    const getPosition = (nativeEvent) => {
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = (nativeEvent.clientX - rect.left - pan.x) / zoom;
-        const y = (nativeEvent.clientY - rect.top - pan.y) / zoom;
-        return { x, y };
-    };
 
     const startDrawing = (nativeEvent) => {
         nativeEvent.preventDefault();
