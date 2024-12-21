@@ -80,6 +80,7 @@ const HomePage = () => {
         offscreenContext.fillText(text, x, y);
     };
 
+
     const getPosition = (nativeEvent) => {
         const rect = canvasRef.current.getBoundingClientRect();
         const x = (nativeEvent.clientX - rect.left - pan.x) / zoom;
