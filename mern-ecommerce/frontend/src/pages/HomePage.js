@@ -1,14 +1,7 @@
- import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
-import { ReactMediaRecorder } from 'react-media-recorder';
-import  AudioRecorder from './AudioRecorder.js';
-
-
-
-
-
 
 const HomePage = () => {
     const canvasRef = useRef(null);
@@ -47,7 +40,7 @@ const HomePage = () => {
         if (loading || !hasMore) return;
         setLoading(true);
         try {
-            const response = await fetch(https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize});
+            const response = await fetch(`https://merntest-1.onrender.com/api/drawings?page=${page}&limit=${pageSize}`);
             const data = await response.json();
 
             let newDrawings = Array.isArray(data) ? data : data.drawings || [];
@@ -131,7 +124,7 @@ const HomePage = () => {
     };
 
     const handleLike = async (drawingId) => {
-        const response = await fetch(https://merntest-1.onrender.com/api/drawings/${drawingId}/like, {
+        const response = await fetch(`https://merntest-1.onrender.com/api/drawings/${drawingId}/like`, {
             method: 'POST',
         });
         const updatedDrawing = await response.json();
@@ -225,31 +218,6 @@ const HomePage = () => {
         setIsJoystickActive(false); // Mark joystick as inactive
     };
 
-
-const saveAudioComment = async (drawingId, audioBlob) => {
-    const formData = new FormData();
-    formData.append('audio', audioBlob);
-    
-    try {
-        const response = await fetch(https://merntest-1.onrender.com/api/drawings/${drawingId}/comments, {
-            method: 'POST',
-            body: formData
-        });
-
-        const updatedDrawing = await response.json();
-        setDrawings((prevDrawings) =>
-            prevDrawings.map((drawing) =>
-                drawing._id === drawingId ? { ...drawing, comments: updatedDrawing.comments } : drawing
-            )
-        );
-    } catch (error) {
-        console.error('Error saving audio comment:', error);
-    }
-};
-
-
-
-
     return (
         <div className="drawing-container">
             <canvas
@@ -280,8 +248,8 @@ const saveAudioComment = async (drawingId, audioBlob) => {
                     className="joystick"
                     style={{
                         position: 'relative',
-                        width: ${joystickRadius * 2}px,
-                        height: ${joystickRadius * 2}px,
+                        width: `${joystickRadius * 2}px`,
+                        height: `${joystickRadius * 2}px`,
                         borderRadius: '50%',
                         backgroundColor: 'lightgray',
                         overflow: 'hidden',
@@ -299,7 +267,7 @@ const saveAudioComment = async (drawingId, audioBlob) => {
                             height: '30px',
                             borderRadius: '50%',
                             backgroundColor: 'blue',
-                            transform: translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px),
+                            transform: `translate(${joystickPosition.x + joystickRadius - 15}px, ${joystickPosition.y + joystickRadius - 15}px)`,
                             transition: 'transform 0.1s',
                         }}
                     />
@@ -309,39 +277,19 @@ const saveAudioComment = async (drawingId, audioBlob) => {
             <button onClick={saveDrawing}>Post</button>
             <button onClick={clearCanvas}>Clear</button>
 
- <div className="posted-drawings">
+            <div className="posted-drawings">
                 {drawings.map((drawing, index) => (
                     <div key={drawing._id} className="drawing-item">
-                        <img src={drawing.drawing} alt={User drawing ${index + 1}} />
+                        <img src={drawing.drawing} alt={`User drawing ${index + 1}`} />
                         <div className="like-section">
                             <button onClick={() => handleLike(drawing._id)}>
                                 <FontAwesomeIcon icon={faHandSparkles} />
                             </button>
                             <span>{drawing.likes || 0}</span>
                         </div>
-
-                        {/* Audio Comment Section */}
-                       <div className="audio-comment-section">
-    <AudioRecorder 
-        drawingId={drawing._id}
-        onSave={saveAudioComment}
-    />
-    
-    <div className="audio-comments">
-        {drawing.comments?.map((comment, i) => (
-            comment.type === 'audio' && (
-                <div key={i}>
-                    <audio src={comment.audioUrl} controls />
-                </div>
-            )
-        ))}
-    </div>
-</div>
                     </div>
                 ))}
             </div>
-
-
 
             {loading && <h4>Loading...</h4>}
         </div>
