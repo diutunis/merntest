@@ -291,7 +291,27 @@ const HomePage = () => {
                     onChange={handleZoomChange}
  className="zoom-slider"
                 />
-
+{showTextInput && (
+                <div
+                    style={{
+                        position: 'absolute',
+                        top: `${textPosition.y}px`,
+                        left: `${textPosition.x}px`,
+                        zIndex: 10,
+                        backgroundColor: 'white',
+                        padding: '5px',
+                        border: '1px solid gray',
+                    }}
+                >
+                    <input
+                        type="text"
+                        value={textInput}
+                        onChange={handleTextInput}
+                        onBlur={submitText}
+                        style={{ fontSize: '16px' }}
+                    />
+                </div>
+            )}
                 {/* Joystick Area */}
                 <div
                     className="joystick"
