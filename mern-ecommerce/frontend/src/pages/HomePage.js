@@ -18,9 +18,10 @@ const HomePage = () => {
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
 
-    const [textMode, setTextMode] = useState(false); // Toggle for text mode
+     const [textMode, setTextMode] = useState(false); // Toggle for text mode
     const [textPosition, setTextPosition] = useState(null); // Position for text input
-
+    const [textInput, setTextInput] = useState(''); // Input text content
+    const [showTextInput, setShowTextInput] = useState(false); // Show/hide the input box
 
     // Joystick state
     const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
@@ -47,19 +48,31 @@ const HomePage = () => {
     const handleCanvasClick = (nativeEvent) => {
         if (!textMode) return;
 
-        const { x, y } = getPosition(nativeEvent);
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = (nativeEvent.clientX - rect.left);
+        const y = (nativeEvent.clientY - rect.top);
         setTextPosition({ x, y });
+        setShowTextInput(true); // Show the text input box
+    };
 
-        // Prompt for text input
-        const userText = prompt('Enter your text:');
-        if (userText) {
-            drawText(userText, x, y);
-        }
+    const handleTextInput = (e) => {
+        setTextInput(e.target.value);
+    };
+
+    const submitText = () => {
+        if (textInput.trim() === '' || !textPosition) return;
+
+        const { x, y } = textPosition;
+        drawText(textInput, x, y);
+
+        // Clear the input and hide it
+        setTextInput('');
+        setShowTextInput(false);
     };
 
     const drawText = (text, x, y) => {
-        context.font = '16px Arial'; // You can customize the font and size
-        context.fillStyle = 'black'; // Set text color
+        context.font = '16px Arial';
+        context.fillStyle = 'black';
         context.fillText(text, x, y);
 
         offscreenContext.font = '16px Arial';
