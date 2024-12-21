@@ -43,14 +43,16 @@ const HomePage = () => {
 
  const toggleTextMode = () => {
         setTextMode((prevMode) => !prevMode);
+        setShowTextInput(false); // Hide input box when exiting text mode
     };
 
     const handleCanvasClick = (nativeEvent) => {
         if (!textMode) return;
 
         const rect = canvasRef.current.getBoundingClientRect();
-        const x = (nativeEvent.clientX - rect.left);
-        const y = (nativeEvent.clientY - rect.top);
+        const x = nativeEvent.clientX - rect.left;
+        const y = nativeEvent.clientY - rect.top;
+
         setTextPosition({ x, y });
         setShowTextInput(true); // Show the text input box
     };
@@ -292,8 +294,12 @@ const HomePage = () => {
                     onChange={handleZoomChange}
  className="zoom-slider"
                 />
-{showTextInput && (
-                <div
+ {showTextInput && textPosition && (
+                <input
+                    type="text"
+                    value={textInput}
+                    onChange={handleTextInput}
+                    onBlur={submitText}
                     style={{
                         position: 'absolute',
                         top: `${textPosition.y}px`,
@@ -302,17 +308,12 @@ const HomePage = () => {
                         backgroundColor: 'white',
                         padding: '5px',
                         border: '1px solid gray',
+                        fontSize: '16px',
                     }}
-                >
-                    <input
-                        type="text"
-                        value={textInput}
-                        onChange={handleTextInput}
-                        onBlur={submitText}
-                        style={{ fontSize: '16px' }}
-                    />
-                </div>
-            )}
+                    autoFocus
+                />
+   )}
+
                 {/* Joystick Area */}
                 <div
                     className="joystick"
