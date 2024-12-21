@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+ import React, { useRef, useState, useEffect } from 'react';
 import './HomePage.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHandSparkles } from '@fortawesome/free-solid-svg-icons';
@@ -25,15 +25,12 @@ const HomePage = () => {
     const [context, setContext] = useState(null);
     const [offscreenContext, setOffscreenContext] = useState(null);
 
-    const [textMode, setTextMode] = useState(false); // Toggle for text mode
-    const [textPosition, setTextPosition] = useState(null); // Position for text input
-
     // Joystick state
     const [joystickPosition, setJoystickPosition] = useState({ x: 0, y: 0 });
     const joystickRadius = 70; // Radius of the joystick circle
     const [isJoystickActive, setIsJoystickActive] = useState(false); // Track joystick usage
 
-     useEffect(() => {
+    useEffect(() => {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         setContext(ctx);
@@ -45,41 +42,6 @@ const HomePage = () => {
         offscreenCanvasRef.current = offscreenCanvas;
         setOffscreenContext(offscreenCtx);
     }, []);
-
-    const toggleTextMode = () => {
-        setTextMode((prevMode) => !prevMode);
-    };
-
-    const handleCanvasClick = (nativeEvent) => {
-        if (!textMode) return;
-
-        const { x, y } = getPosition(nativeEvent);
-        setTextPosition({ x, y });
-
-        // Prompt for text input
-        const userText = prompt('Enter your text:');
-        if (userText) {
-            drawText(userText, x, y);
-        }
-    };
-
-    const drawText = (text, x, y) => {
-        context.font = '16px Arial'; // You can customize the font and size
-        context.fillStyle = 'black'; // Set text color
-        context.fillText(text, x, y);
-
-        offscreenContext.font = '16px Arial';
-        offscreenContext.fillStyle = 'black';
-        offscreenContext.fillText(text, x, y);
-    };
-
-    const getPosition = (nativeEvent) => {
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = (nativeEvent.clientX - rect.left - pan.x) / zoom;
-        const y = (nativeEvent.clientY - rect.top - pan.y) / zoom;
-        return { x, y };
-    };
-
 
     const fetchDrawings = async () => {
         if (loading || !hasMore) return;
@@ -301,9 +263,6 @@ const saveAudioComment = async (drawingId, audioBlob) => {
                 height={500}
             />
             <div className="controls">
-     <button onClick={toggleTextMode}>
-                    {textMode ? 'Exit Text Mode' : 'Text Mode'}
-                </button>
                 <label htmlFor="zoom">Zoom: {zoom}</label>
                 <input
                     type="range"
